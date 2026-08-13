@@ -1,0 +1,12 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "si-eventos-frm": {
+      "$eventId": {
+        ".read": true,
+        ".write": true
+      }
+    }
+  }
+}

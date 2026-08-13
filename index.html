@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Siempre Invitados — Detalles de tu Evento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;0,9..144,700;1,9..144,450&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FDFBFF;
+    --terra:#F6AFC7;
+    --terra-deep:#EE8FB0;
+    --clay:#FDE4EF;
+    --sage:#A8D8D8;
+    --ink:#6B5C7A;
+    --brown-soft:#B3A6C4;
+    --line:#EDE3F5;
+    --white:#FFFFFF;
+    --peach:#E4D4F7;
+    --lilac:#C9B6E4;
+    --sky:#AED4EA;
+    --mint:#B4E4C9;
+    --butter:#FDE8A8;
+  }
+  [data-theme="dark"]{
+    --cream:#2B2438;
+    --terra:#F0A8C4;
+    --terra-deep:#F6BDD5;
+    --clay:#42395A;
+    --sage:#8FC7C4;
+    --ink:#EEE6F7;
+    --brown-soft:#B3A6C4;
+    --line:#42395A;
+    --white:#332A45;
+    --peach:#3D3350;
+    --lilac:#B79FDB;
+    --sky:#8FBBD9;
+    --mint:#8FCDAE;
+    --butter:#E8D08F;
+  }
+  body{transition:background .3s ease, color .3s ease;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:'Manrope',sans-serif;}
+  ::selection{background:var(--peach);}
+
+  .wrap{max-width:640px;margin:0 auto;padding:0 24px 100px;}
+
+  header.hero{
+    padding:60px 24px 38px;
+    text-align:center;
+    position:relative;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(246,175,199,0.18), transparent 50%),
+      radial-gradient(circle at 85% 0%, rgba(174,212,234,0.18), transparent 50%),
+      radial-gradient(circle at 50% 90%, rgba(180,228,201,0.14), transparent 55%),
+      var(--cream);
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+  }
+  .brandmark{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'Fraunces',serif;font-weight:600;font-size:13px;letter-spacing:.05em;
+    color:var(--terra-deep);margin-bottom:26px;
+    padding:7px 16px;border:1px solid var(--terra);border-radius:999px;
+    background:rgba(255,252,248,0.6);
+  }
+  .brandmark .dot{width:6px;height:6px;border-radius:50%;background:var(--terra);}
+  .eyebrow{
+    font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--sage);font-weight:700;margin-bottom:14px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:450;
+    font-size:clamp(30px,6vw,44px);
+    line-height:1.14;
+    margin:0 0 14px;
+    letter-spacing:-0.01em;
+  }
+  h1 em{font-style:italic;color:var(--terra);font-weight:450;}
+  .sub{
+    font-size:15.5px;color:var(--brown-soft);line-height:1.6;
+    max-width:440px;margin:0 auto;
+  }
+
+  nav.progress{
+    position:sticky;top:0;z-index:20;
+    background:color-mix(in srgb, var(--cream) 94%, transparent);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+    padding:12px 24px;
+  }
+  .progress-track{max-width:640px;margin:0 auto;height:5px;background:var(--line);border-radius:4px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--sky),var(--mint),var(--terra));width:0%;transition:width .35s ease;border-radius:4px;opacity:0.8;}
+  [data-theme="dark"] .progress-fill{opacity:0.6;}
+  .progress-label{max-width:640px;margin:6px auto 0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--brown-soft);text-align:right;}
+
+  section.step{padding:42px 0 8px;border-bottom:1px solid var(--line);}
+  section.step:last-of-type{border-bottom:none;}
+
+  .step-num{
+    font-family:'Fraunces',serif;font-style:italic;font-size:14px;color:var(--terra);
+    margin-bottom:6px;display:block;
+  }
+  .step-title{
+    font-family:'Fraunces',serif;font-size:22px;font-weight:600;margin:0 0 4px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .step-icon{font-size:20px;}
+  .step-desc{font-size:13.5px;color:var(--brown-soft);margin:0 0 20px;line-height:1.55;}
+
+  .help-box{
+    background:var(--white);border:1px solid var(--line);border-left:3px solid var(--sage);
+    border-radius:10px;padding:13px 16px;margin-bottom:20px;
+    font-size:13px;color:var(--brown-soft);line-height:1.6;
+  }
+  .help-box strong{color:var(--ink);}
+
+  .field{margin-bottom:18px;}
+  .field label{
+    display:block;font-size:12.5px;font-weight:700;color:var(--brown-soft);
+    margin-bottom:7px;letter-spacing:.01em;
+  }
+  .field .hint{font-weight:400;color:var(--brown-soft);font-size:11.5px;margin-left:4px;}
+  input[type=text], input[type=date], input[type=time], input[type=tel], input[type=url], textarea, select{
+    width:100%;padding:12px 14px;
+    border:1.5px solid var(--line);border-radius:10px;
+    background:var(--white);
+    font-family:'Manrope',sans-serif;font-size:14.5px;color:var(--ink);
+    transition:border-color .2s, box-shadow .2s;
+  }
+  textarea{resize:vertical;min-height:70px;}
+  input:focus, textarea:focus, select:focus{
+    outline:none;border-color:var(--terra);
+    box-shadow:0 0 0 3px rgba(201,116,82,0.14);
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:480px){.row2{grid-template-columns:1fr;}}
+
+  .toggle-group{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
+  .toggle-btn{
+    padding:10px 18px;border-radius:999px;border:1.5px solid var(--line);
+    background:var(--white);font-size:13.5px;font-weight:700;color:var(--brown-soft);
+    cursor:pointer;transition:all .2s;
+  }
+  .toggle-btn.active{
+    background:var(--terra);border-color:var(--terra);color:var(--white);
+    box-shadow:0 4px 12px rgba(201,116,82,0.28);
+  }
+  .conditional{
+    overflow:hidden;max-height:0;opacity:0;transition:max-height .4s ease, opacity .3s ease, margin .4s ease;
+  }
+  .conditional.open{max-height:1400px;opacity:1;margin-top:4px;}
+
+  .divider-note{
+    background:var(--white);border:1px dashed var(--line);border-radius:12px;
+    padding:14px 16px;font-size:12.5px;color:var(--brown-soft);margin-top:6px;
+  }
+
+  /* Repeating sub-blocks (ubicaciones extra / enlaces de regalo) */
+  .subcard{
+    background:var(--white);border:1.5px solid var(--line);border-radius:14px;
+    padding:18px;margin-bottom:14px;position:relative;
+  }
+  .subcard-head{
+    display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;
+  }
+  .subcard-label{
+    font-family:'Fraunces',serif;font-size:14px;font-style:italic;color:var(--terra-deep);
+  }
+  .remove-subcard{
+    background:none;border:none;color:var(--terra-deep);font-size:12px;font-weight:700;cursor:pointer;
+    padding:4px 8px;
+  }
+  .add-more-btn{
+    width:100%;padding:13px;border:1.5px dashed var(--terra);border-radius:12px;
+    background:rgba(201,116,82,0.06);color:var(--terra-deep);font-weight:700;font-size:13.5px;
+    cursor:pointer;transition:background .2s;font-family:'Manrope',sans-serif;
+  }
+  .add-more-btn:hover{background:rgba(201,116,82,0.12);}
+
+  /* Chips (avisos sugeridos) */
+  .chip-group{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:16px;}
+  .chip{
+    padding:9px 15px;border-radius:999px;border:1.5px solid var(--line);
+    background:var(--white);font-size:13px;font-weight:600;color:var(--brown-soft);
+    cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;
+  }
+  .chip.active{
+    background:var(--sage);border-color:var(--sage);color:var(--ink);
+  }
+  .chip.active:nth-of-type(4n+1){background:var(--terra);border-color:var(--terra);}
+  .chip.active:nth-of-type(4n+2){background:var(--sky);border-color:var(--sky);}
+  .chip.active:nth-of-type(4n+3){background:var(--mint);border-color:var(--mint);}
+  .chip.active:nth-of-type(4n+4){background:var(--butter);border-color:var(--butter);}
+
+  footer.submit-area{padding:44px 0 20px;text-align:center;}
+  .submit-btn{
+    width:100%;padding:17px;border:none;border-radius:12px;
+    background:linear-gradient(135deg,var(--terra),var(--lilac));
+    color:var(--white);font-family:'Manrope',sans-serif;font-weight:800;font-size:15.5px;
+    letter-spacing:.02em;cursor:pointer;box-shadow:0 10px 24px rgba(238,143,176,0.30);
+    transition:transform .2s, box-shadow .2s;
+  }
+  .submit-btn:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(238,143,176,0.38);}
+  .submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+  .submit-note{font-size:12px;color:var(--brown-soft);margin-top:12px;}
+
+  .form-live{display:block;}
+
+  /* ADMIN PANEL */
+  .admin-toggle{
+    position:fixed;bottom:18px;right:18px;z-index:50;
+    background:var(--ink);color:var(--cream);border:none;border-radius:999px;
+    padding:11px 18px;font-size:12.5px;font-weight:700;font-family:'Manrope',sans-serif;
+    cursor:pointer;box-shadow:0 8px 20px rgba(58,46,39,0.30);letter-spacing:.02em;
+  }
+  .admin-panel{
+    display:none;position:fixed;inset:0;background:var(--cream);z-index:100;
+    overflow-y:auto;padding:0;
+  }
+  .admin-panel.show{display:block;}
+  .admin-header{
+    padding:28px 24px 20px;border-bottom:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:flex-start;
+    background:var(--white);position:sticky;top:0;z-index:5;
+  }
+  .admin-header h2{font-family:'Fraunces',serif;font-size:24px;margin:0 0 4px;}
+  .admin-header p{margin:0;color:var(--brown-soft);font-size:13px;}
+  .admin-close{
+    background:none;border:1.5px solid var(--line);border-radius:8px;padding:8px 14px;
+    cursor:pointer;font-size:13px;font-weight:700;color:var(--brown-soft);
+  }
+  .admin-body{max-width:760px;margin:0 auto;padding:24px 24px 80px;}
+  .admin-empty{text-align:center;padding:80px 20px;color:var(--brown-soft);}
+  .response-card{
+    background:var(--white);border:1px solid var(--line);border-radius:14px;
+    padding:22px;margin-bottom:16px;
+  }
+  .response-card-head{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--line);
+    flex-wrap:wrap;gap:8px;
+  }
+  .response-card-head h3{font-family:'Fraunces',serif;font-size:19px;margin:0;}
+  .response-date{font-size:11.5px;color:var(--brown-soft);}
+  .response-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;}
+  @media(max-width:560px){.response-grid{grid-template-columns:1fr;}}
+  .resp-item{font-size:13px;}
+  .resp-item .k{color:var(--brown-soft);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:2px;}
+  .resp-item .v{color:var(--ink);line-height:1.45;white-space:pre-line;}
+  .resp-item.full{grid-column:1/-1;}
+  .delete-btn{
+    background:none;border:none;color:var(--terra-deep);font-size:12px;font-weight:700;
+    cursor:pointer;padding:4px 0;
+  }
+  .admin-loading{text-align:center;padding:60px;color:var(--brown-soft);}
+
+  .theme-toggle{
+    position:fixed;top:18px;right:18px;z-index:60;
+    width:42px;height:42px;border-radius:50%;
+    background:var(--white);border:1.5px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,0.08);
+    transition:transform .2s, background .3s ease;
+  }
+  .theme-toggle:hover{transform:scale(1.06);}
+  .theme-toggle svg{width:19px;height:19px;}
+  .theme-toggle .icon-sun{display:none;}
+  [data-theme="dark"] .theme-toggle .icon-moon{display:none;}
+  [data-theme="dark"] .theme-toggle .icon-sun{display:block;}
+
+  /* Fieldset de bloqueo del formulario */
+  #formFieldset{border:none;margin:0;padding:0;min-width:0;}
+  fieldset:disabled input,
+  fieldset:disabled textarea,
+  fieldset:disabled select{
+    background:var(--clay);opacity:.85;cursor:not-allowed;
+  }
+  fieldset:disabled .toggle-btn,
+  fieldset:disabled .chip,
+  fieldset:disabled .add-more-btn,
+  fieldset:disabled .remove-subcard{
+    cursor:not-allowed;pointer-events:none;
+  }
+  fieldset:disabled .toggle-btn:not(.active),
+  fieldset:disabled .chip:not(.active){opacity:.45;}
+  fieldset:disabled .add-more-btn{opacity:.35;}
+
+  .help-box.success{border-left-color:var(--mint);}
+  .help-box.warning{border-left-color:var(--butter);}
+  .help-box.error{border-left-color:var(--terra-deep);}
+
+  .copy-btn{
+    background:none;border:1px solid var(--line);border-radius:6px;
+    color:var(--terra-deep);font-size:11px;font-weight:700;cursor:pointer;
+    padding:2px 8px;margin-left:6px;font-family:'Manrope',sans-serif;
+  }
+  .copy-btn.copied{color:var(--sage);border-color:var(--sage);}
+  .copy-all-btn{
+    background:var(--terra);border:none;border-radius:10px;color:var(--white);
+    font-weight:700;font-size:13px;padding:10px 18px;cursor:pointer;
+    font-family:'Manrope',sans-serif;margin-top:14px;
+  }
+  .copy-all-btn.copied{background:var(--sage);}
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
+  <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink)"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ink)"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+</button>
+
+<div id="formLive" class="form-live">
+  <header class="hero">
+    <div class="brandmark"><span class="dot"></span>Siempre Invitados</div>
+    <div class="eyebrow">Invitación digital</div>
+    <h1>Cuéntanos los <em>detalles</em><br>de tu evento</h1>
+    <p class="sub">Completa este formulario y con esa información armamos tu invitación digital. Solo toma unos minutos.</p>
+  </header>
+
+  <nav class="progress">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0% completado</div>
+  </nav>
+
+  <div class="wrap">
+    <form id="inviteForm">
+      <div id="formBanner" class="help-box" style="display:none;"></div>
+      <fieldset id="formFieldset">
+
+      <!-- 1. Festejado -->
+      <section class="step">
+        <span class="step-num">Uno</span>
+        <h2 class="step-title"><span class="step-icon">👶</span>El festejado</h2>
+        <p class="step-desc">La persona festejada</p>
+        <div class="field">
+          <label>Nombre completo</label>
+          <input type="text" name="festejado_nombre" placeholder="Ej. María José Hernández López">
+        </div>
+      </section>
+
+      <!-- 2. Papás -->
+      <section class="step">
+        <span class="step-num">Dos</span>
+        <h2 class="step-title"><span class="step-icon">👨‍👩‍👦</span>Los papás</h2>
+        <p class="step-desc">¿Desean que aparezcan en la invitación?</p>
+        <div class="toggle-group" data-toggle="papas_aparecer">
+          <button type="button" class="toggle-btn" data-value="Sí">Sí</button>
+          <button type="button" class="toggle-btn" data-value="No">No</button>
+        </div>
+        <div class="conditional" data-cond="papas_aparecer" data-show="Sí">
+          <div class="field">
+            <label>Nombre completo del papá</label>
+            <input type="text" name="papa_nombre">
+          </div>
+          <div class="field">
+            <label>Nombre completo de la mamá</label>
+            <input type="text" name="mama_nombre">
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Padrinos -->
+      <section class="step">
+        <span class="step-num">Tres</span>
+        <h2 class="step-title"><span class="step-icon">🎗️</span>Los padrinos</h2>
+        <p class="step-desc">¿Desean que aparezcan en la invitación?</p>
+        <div class="toggle-group" data-toggle="padrinos_aparecer">
+          <button type="button" class="toggle-btn" data-value="Sí">Sí</button>
+          <button type="button" class="toggle-btn" data-value="No">No</button>
+        </div>
+        <div class="conditional" data-cond="padrinos_aparecer" data-show="Sí">
+          <div class="field">
+            <label>Nombre(s) completo(s) <span class="hint">— si son varios (de vela, de listón, etc.) indícalo</span></label>
+            <textarea name="padrinos_nombres" placeholder="Ej. Padrinos de bautizo: Juan Pérez y Ana Gómez"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Iglesia -->
+      <section class="step">
+        <span class="step-num">Cuatro</span>
+        <h2 class="step-title"><span class="step-icon">✝️</span>Ceremonia religiosa</h2>
+        <p class="step-desc">¿Habrá ceremonia en iglesia?</p>
+        <div class="toggle-group" data-toggle="iglesia_hay">
+          <button type="button" class="toggle-btn" data-value="Sí">Sí</button>
+          <button type="button" class="toggle-btn" data-value="No">No</button>
+        </div>
+        <div class="conditional" data-cond="iglesia_hay" data-show="Sí">
+          <div class="field">
+            <label>Nombre de la iglesia</label>
+            <input type="text" name="iglesia_nombre">
+          </div>
+          <div class="field">
+            <label>Dirección completa</label>
+            <input type="text" name="iglesia_direccion">
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>Fecha</label>
+              <input type="date" name="iglesia_fecha">
+            </div>
+            <div class="field">
+              <label>Hora</label>
+              <input type="time" name="iglesia_hora">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Salón -->
+      <section class="step">
+        <span class="step-num">Cinco</span>
+        <h2 class="step-title"><span class="step-icon">🎉</span>Recepción</h2>
+        <p class="step-desc">Lugar de la fiesta o salón</p>
+        <div class="field">
+          <label>Nombre del salón o lugar</label>
+          <input type="text" name="salon_nombre">
+        </div>
+        <div class="field">
+          <label>Dirección completa</label>
+          <input type="text" name="salon_direccion">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label>Fecha</label>
+            <input type="date" name="salon_fecha">
+          </div>
+          <div class="field">
+            <label>Hora</label>
+            <input type="time" name="salon_hora">
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Otra ubicación (repetible, mismo formato que iglesia/salón) -->
+      <section class="step">
+        <span class="step-num">Seis</span>
+        <h2 class="step-title"><span class="step-icon">📍</span>Otra ubicación</h2>
+        <p class="step-desc">¿Hay algún otro punto del evento? (ej. lugar de coctel, después-fiesta, brindis)</p>
+        <div class="toggle-group" data-toggle="otra_ubicacion_hay">
+          <button type="button" class="toggle-btn" data-value="Sí">Sí</button>
+          <button type="button" class="toggle-btn" data-value="No">No</button>
+        </div>
+        <div class="conditional" data-cond="otra_ubicacion_hay" data-show="Sí">
+          <div id="extraLocationsContainer"></div>
+          <button type="button" class="add-more-btn" id="addLocationBtn">+ Agregar otra ubicación</button>
+        </div>
+      </section>
+
+      <!-- 7. Avisos -->
+      <section class="step">
+        <span class="step-num">Siete</span>
+        <h2 class="step-title"><span class="step-icon">📢</span>Avisos</h2>
+        <p class="step-desc">Selecciona los avisos que apliquen a tu evento — puedes elegir varios</p>
+        <div class="chip-group" id="avisosChips">
+          <button type="button" class="chip" data-value="Evento solo para adultos">🎉 Solo adultos</button>
+          <button type="button" class="chip" data-value="Se aceptan niños">🧒 Se aceptan niños</button>
+          <button type="button" class="chip" data-value="Contamos con estacionamiento">🅿️ Hay estacionamiento</button>
+          <button type="button" class="chip" data-value="No contamos con estacionamiento">🚫 Sin estacionamiento</button>
+          <button type="button" class="chip" data-value="Habrá servicio de valet parking">🚗 Valet parking</button>
+          <button type="button" class="chip" data-value="Evento al aire libre, viste acorde al clima">🌤️ Evento al aire libre</button>
+          <button type="button" class="chip" data-value="Se recomienda llegar con anticipación">⏰ Llegar con anticipación</button>
+          <button type="button" class="chip" data-value="Habrá transporte disponible">🚌 Transporte disponible</button>
+          <button type="button" class="chip" data-value="Lugar accesible para sillas de ruedas">♿ Acceso para sillas de ruedas</button>
+        </div>
+        <div class="field">
+          <label>Otro aviso <span class="hint">(opcional, escribe cualquier detalle adicional)</span></label>
+          <textarea name="avisos_otro" placeholder="Ej. Por favor confirmar alergias alimentarias"></textarea>
+        </div>
+      </section>
+
+      <!-- 8. Cuenta regresiva -->
+      <section class="step">
+        <span class="step-num">Ocho</span>
+        <h2 class="step-title"><span class="step-icon">⏳</span>Cuenta regresiva</h2>
+        <p class="step-desc">¿La quieres activa en tu invitación?</p>
+        <div class="toggle-group" data-toggle="cuenta_regresiva">
+          <button type="button" class="toggle-btn" data-value="Sí">Sí</button>
+          <button type="button" class="toggle-btn" data-value="No">No</button>
+        </div>
+      </section>
+
+      <!-- 9. Confirmación -->
+      <section class="step">
+        <span class="step-num">Nueve</span>
+        <h2 class="step-title"><span class="step-icon">✅</span>Confirmación de asistencia</h2>
+        <p class="step-desc">¿La quieres activa?</p>
+        <div class="toggle-group" data-toggle="confirmacion">
+          <button type="button" class="toggle-btn" data-value="Sí">Sí</button>
+          <button type="button" class="toggle-btn" data-value="No">No</button>
+        </div>
+      </section>
+
+      <!-- 10. Vestimenta -->
+      <section class="step">
+        <span class="step-num">Diez</span>
+        <h2 class="step-title"><span class="step-icon">👗</span>Código de vestimenta</h2>
+        <p class="step-desc">¿Aplica código de vestimenta?</p>
+        <div class="toggle-group" data-toggle="vestimenta_aplica">
+          <button type="button" class="toggle-btn" data-value="Sí">Sí</button>
+          <button type="button" class="toggle-btn" data-value="No">No</button>
+        </div>
+        <div class="conditional" data-cond="vestimenta_aplica" data-show="Sí">
+          <div class="field">
+            <label>¿Cuál es? <span class="hint">(formal, casual, colores a evitar, etc.)</span></label>
+            <input type="text" name="vestimenta_detalle">
+          </div>
+        </div>
+      </section>
+
+      <!-- 11. Mesa de regalos (repetible) -->
+      <section class="step">
+        <span class="step-num">Once</span>
+        <h2 class="step-title"><span class="step-icon">🎁</span>Mesa de regalos</h2>
+        <p class="step-desc">¿Tienen mesa de regalos?</p>
+        <div class="toggle-group" data-toggle="regalos_hay">
+          <button type="button" class="toggle-btn" data-value="Sí">Sí</button>
+          <button type="button" class="toggle-btn" data-value="No">No</button>
+        </div>
+        <div class="conditional" data-cond="regalos_hay" data-show="Sí">
+          <div id="giftLinksContainer"></div>
+          <button type="button" class="add-more-btn" id="addGiftBtn">+ Agregar otro enlace</button>
+        </div>
+        <div class="conditional" data-cond="regalos_hay" data-show="No">
+          <div class="divider-note">Se mostrará la frase: "Tu presencia es nuestro mejor regalo" — dime si prefieres otra frase.</div>
+          <div class="field" style="margin-top:14px;">
+            <label>Frase alternativa <span class="hint">(opcional)</span></label>
+            <input type="text" name="regalos_frase">
+          </div>
+        </div>
+      </section>
+
+      <!-- 12. Timeline -->
+      <section class="step">
+        <span class="step-num">Doce</span>
+        <h2 class="step-title"><span class="step-icon">🕒</span>Línea de tiempo</h2>
+        <p class="step-desc">¿Quieres incluir los momentos clave del evento?</p>
+        <div class="toggle-group" data-toggle="timeline_hay">
+          <button type="button" class="toggle-btn" data-value="Sí">Sí</button>
+          <button type="button" class="toggle-btn" data-value="No">No</button>
+        </div>
+        <div class="conditional" data-cond="timeline_hay" data-show="Sí">
+          <div class="field">
+            <label>Momentos y horarios <span class="hint">(ej. 12:00 Ceremonia, 14:00 Recepción, 15:00 Comida...)</span></label>
+            <textarea name="timeline_detalle" placeholder="Un momento por línea"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- 13. Frase -->
+      <section class="step">
+        <span class="step-num">Trece</span>
+        <h2 class="step-title"><span class="step-icon">💬</span>Frase o versículo</h2>
+        <p class="step-desc">Opcional — dedicatoria especial al inicio de la invitación</p>
+        <div class="field">
+          <label>Frase / versículo</label>
+          <textarea name="frase_versiculo"></textarea>
+        </div>
+      </section>
+
+      <!-- 14. Diseño -->
+      <section class="step">
+        <span class="step-num">Catorce</span>
+        <h2 class="step-title"><span class="step-icon">🎨</span>Sobre el diseño</h2>
+        <p class="step-desc">¿Qué opción prefieres?</p>
+        <div class="field">
+          <label>Opción de diseño</label>
+          <select name="diseno_opcion">
+            <option value="">Selecciona una opción</option>
+            <option value="Diseño existente ($450 MXN)">Diseño existente — cambio de colores e info ($450 MXN)</option>
+            <option value="Basado en referencia ($550 MXN)">Basado en una invitación de referencia ($550 MXN)</option>
+            <option value="Diseño 100% nuevo ($650 MXN)">Diseño 100% nuevo — 2 propuestas + 3 modificaciones ($650 MXN)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Referencia o idea <span class="hint">(link de la invitación que te gustó, o describe tu idea)</span></label>
+          <textarea name="diseno_referencia"></textarea>
+        </div>
+        <div class="field">
+          <label>Colores que te gustaría</label>
+          <input type="text" name="diseno_colores">
+        </div>
+      </section>
+
+      </fieldset>
+      <footer class="submit-area">
+        <button type="submit" class="submit-btn" id="submitBtn">Enviar mis datos</button>
+        <button type="button" class="submit-btn" id="editBtn" style="display:none;">Editar mis datos</button>
+        <p class="submit-note" id="submitNote">Tus respuestas se guardan directamente para que podamos empezar a trabajar en tu invitación.</p>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<div id="viewOnlyScreen" style="display:none;">
+  <div class="admin-header">
+    <div>
+      <h2>Detalle del evento</h2>
+      <p>Información enviada por el cliente — lista para copiar</p>
+    </div>
+  </div>
+  <div class="admin-body" id="viewOnlyBody"></div>
+</div>
+
+<button class="admin-toggle" id="adminToggleBtn">Ver respuestas</button>
+
+<div class="admin-panel" id="adminPanel">
+  <div class="admin-header">
+    <div>
+      <h2>Respuestas recibidas</h2>
+      <p id="adminSubtitle">Cargando...</p>
+    </div>
+    <button class="admin-close" id="adminCloseBtn">Cerrar</button>
+  </div>
+  <div class="admin-body" id="adminBody">
+    <div class="admin-loading">Cargando respuestas...</div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import {
+  getDatabase, ref, get, set, remove
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC6Xrc9EqMyXKH_gNFaOGuAX-ItudzZAVs",
+  authDomain: "bautizo-sofia.firebaseapp.com",
+  databaseURL: "https://bautizo-sofia-default-rtdb.firebaseio.com",
+  projectId: "bautizo-sofia",
+  storageBucket: "bautizo-sofia.firebasestorage.app",
+  messagingSenderId: "981839514602",
+  appId: "1:981839514602:web:981d3b9a4dcde418c84093",
+  measurementId: "G-TVQSGB0FWT"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const EVENTS_PATH = 'si-eventos-frm';
+const eventRef = (id) => ref(db, `${EVENTS_PATH}/${id}`);
+
+let currentEventId = null;
+
+function randomId(){
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  const bytes = new Uint8Array(4);
+  crypto.getRandomValues(bytes);
+  return 'sinv-' + Array.from(bytes, b => chars[b % chars.length]).join('');
+}
+
+async function generateUniqueId(maxAttempts = 5){
+  for (let i = 0; i < maxAttempts; i++) {
+    const candidate = randomId();
+    try {
+      const snap = await get(eventRef(candidate));
+      if (!snap.exists()) return candidate;
+    } catch(err) {
+      console.warn('No se pudo verificar unicidad de id', err);
+      return candidate;
+    }
+  }
+  return randomId() + Math.random().toString(36).slice(2, 4);
+}
+
+// Theme toggle
+const themeToggle = document.getElementById('themeToggle');
+
+themeToggle.addEventListener('click', () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if (isDark) document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', 'dark');
+});
+
+const toggles = {};
+const avisosSeleccionados = new Set();
+
+document.querySelectorAll('.toggle-group').forEach(group => {
+  const key = group.dataset.toggle;
+  toggles[key] = null;
+  group.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      group.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      toggles[key] = btn.dataset.value;
+      document.querySelectorAll(`.conditional[data-cond="${key}"]`).forEach(cond => {
+        cond.classList.toggle('open', cond.dataset.show === btn.dataset.value);
+      });
+      if (key === 'otra_ubicacion_hay' && btn.dataset.value === 'Sí' && locationCount === 0) {
+        addLocationBlock();
+      }
+      if (key === 'otra_ubicacion_hay' && btn.dataset.value === 'No') {
+        extraLocationsContainer.innerHTML = '';
+        locationCount = 0;
+      }
+      updateProgress();
+    });
+  });
+});
+
+document.querySelectorAll('#avisosChips .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    chip.classList.toggle('active');
+    if (chip.classList.contains('active')) avisosSeleccionados.add(chip.dataset.value);
+    else avisosSeleccionados.delete(chip.dataset.value);
+    updateProgress();
+  });
+});
+
+// Reasigna name/data-index/label de forma contigua (1..N) tras eliminar un
+// subcard, para que el prefill siempre pueda asumir índices sin huecos.
+function renumberBlocks(container, counterSetter, namePrefixes, labelPrefix, dataAttr){
+  const blocks = Array.from(container.querySelectorAll('.subcard'));
+  counterSetter(blocks.length);
+  blocks.forEach((block, i) => {
+    const idx = i + 1;
+    block.dataset[dataAttr] = idx;
+    block.querySelector('.subcard-label').textContent = `${labelPrefix} ${idx}`;
+    namePrefixes.forEach(prefix => {
+      const input = block.querySelector(`[name^="${prefix}"]`);
+      if (input) input.name = `${prefix}${idx}`;
+    });
+  });
+}
+
+// --- Extra locations (repeatable) ---
+let locationCount = 0;
+const extraLocationsContainer = document.getElementById('extraLocationsContainer');
+document.getElementById('addLocationBtn').addEventListener('click', () => addLocationBlock());
+
+function addLocationBlock(){
+  locationCount++;
+  const idx = locationCount;
+  const div = document.createElement('div');
+  div.className = 'subcard';
+  div.dataset.locIndex = idx;
+  div.innerHTML = `
+    <div class="subcard-head">
+      <span class="subcard-label">Ubicación adicional ${idx}</span>
+      <button type="button" class="remove-subcard">Eliminar</button>
+    </div>
+    <div class="field">
+      <label>Nombre del lugar</label>
+      <input type="text" name="extra_ubicacion_nombre_${idx}" placeholder="Ej. Jardín El Mirador">
+    </div>
+    <div class="field">
+      <label>Dirección completa</label>
+      <input type="text" name="extra_ubicacion_direccion_${idx}">
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Fecha</label>
+        <input type="date" name="extra_ubicacion_fecha_${idx}">
+      </div>
+      <div class="field">
+        <label>Hora</label>
+        <input type="time" name="extra_ubicacion_hora_${idx}">
+      </div>
+    </div>
+  `;
+  div.querySelector('.remove-subcard').addEventListener('click', () => {
+    div.remove();
+    renumberBlocks(extraLocationsContainer, n => locationCount = n,
+      ['extra_ubicacion_nombre_','extra_ubicacion_direccion_','extra_ubicacion_fecha_','extra_ubicacion_hora_'],
+      'Ubicación adicional', 'locIndex');
+    updateProgress();
+  });
+  div.querySelectorAll('input').forEach(el => el.addEventListener('input', updateProgress));
+  extraLocationsContainer.appendChild(div);
+  updateProgress();
+}
+
+// --- Gift links (repeatable) ---
+let giftCount = 0;
+const giftLinksContainer = document.getElementById('giftLinksContainer');
+document.getElementById('addGiftBtn').addEventListener('click', () => addGiftBlock());
+
+function addGiftBlock(){
+  giftCount++;
+  const idx = giftCount;
+  const div = document.createElement('div');
+  div.className = 'subcard';
+  div.dataset.giftIndex = idx;
+  div.innerHTML = `
+    <div class="subcard-head">
+      <span class="subcard-label">Enlace ${idx}</span>
+      <button type="button" class="remove-subcard">Eliminar</button>
+    </div>
+    <div class="field">
+      <label>Tienda</label>
+      <input type="text" name="regalo_tienda_${idx}" placeholder="Ej. Liverpool, Amazon...">
+    </div>
+    <div class="field">
+      <label>Enlace</label>
+      <input type="url" name="regalo_liga_${idx}" placeholder="https://...">
+    </div>
+  `;
+  div.querySelector('.remove-subcard').addEventListener('click', () => {
+    div.remove();
+    renumberBlocks(giftLinksContainer, n => giftCount = n,
+      ['regalo_tienda_','regalo_liga_'], 'Enlace', 'giftIndex');
+    updateProgress();
+  });
+  div.querySelectorAll('input').forEach(el => el.addEventListener('input', updateProgress));
+  giftLinksContainer.appendChild(div);
+  updateProgress();
+}
+
+const form = document.getElementById('inviteForm');
+const allInputs = () => form.querySelectorAll('input, textarea, select');
+
+function updateProgress(){
+  const inputs = Array.from(allInputs()).filter(el => {
+    const cond = el.closest('.conditional');
+    return !cond || cond.classList.contains('open');
+  });
+  const filled = inputs.filter(el => el.value.trim() !== '').length;
+  const total = inputs.length + 1; // +1 for avisos chip group as a "field"
+  const filledTotal = filled + (avisosSeleccionados.size > 0 ? 1 : 0);
+  const pct = total ? Math.round((filledTotal/total)*100) : 0;
+  document.getElementById('progressFill').style.width = Math.min(pct,100) + '%';
+  document.getElementById('progressLabel').textContent = Math.min(pct,100) + '% completado';
+}
+allInputs().forEach(el => el.addEventListener('input', updateProgress));
+updateProgress();
+
+// --- Bloqueo / edición tras enviar ---
+const formFieldset = document.getElementById('formFieldset');
+const editBtn = document.getElementById('editBtn');
+const submitNote = document.getElementById('submitNote');
+
+function applyLockedState(isLocked){
+  formFieldset.disabled = isLocked;
+  document.getElementById('submitBtn').style.display = isLocked ? 'none' : '';
+  editBtn.style.display = isLocked ? '' : 'none';
+  submitNote.textContent = isLocked
+    ? 'Ya enviaste tus datos. Puedes editarlos cuando quieras con el botón de arriba.'
+    : 'Tus respuestas se guardan directamente para que podamos empezar a trabajar en tu invitación.';
+}
+
+editBtn.addEventListener('click', () => applyLockedState(false));
+
+function showBanner(message, type = 'info'){
+  const el = document.getElementById('formBanner');
+  el.textContent = message;
+  el.className = 'help-box' + (type !== 'info' ? ' ' + type : '');
+  el.style.display = 'block';
+}
+
+// --- Precarga del formulario con datos ya guardados ---
+function fillForm(data){
+  // 1) Crear los bloques repetibles ANTES de setear valores, si no los inputs no existen aún
+  const locIndices = Object.keys(data).filter(k => /^extra_ubicacion_nombre_\d+$/.test(k)).length;
+  for (let i = 0; i < locIndices; i++) addLocationBlock();
+  const giftIndices = Object.keys(data).filter(k => /^regalo_tienda_\d+$/.test(k)).length;
+  for (let i = 0; i < giftIndices; i++) addGiftBlock();
+
+  // 2) Setear valores de inputs/textareas/selects normales (incluye los recién creados)
+  Object.keys(data).forEach(key => {
+    const el = form.elements[key];
+    if (el) el.value = data[key] ?? '';
+  });
+
+  // 3) Simular los toggles Sí/No (reusa el handler existente: marca active, abre el .conditional)
+  const toggleKeys = ['papas_aparecer','padrinos_aparecer','iglesia_hay','otra_ubicacion_hay',
+    'cuenta_regresiva','confirmacion','vestimenta_aplica','regalos_hay','timeline_hay'];
+  toggleKeys.forEach(key => {
+    if (!data[key]) return;
+    const btn = document.querySelector(`.toggle-group[data-toggle="${key}"] .toggle-btn[data-value="${data[key]}"]`);
+    if (btn) btn.click();
+  });
+
+  // 4) Chips de avisos
+  const avisos = (data['avisos_seleccionados'] || '').split(' · ').filter(Boolean);
+  document.querySelectorAll('#avisosChips .chip').forEach(chip => {
+    if (avisos.includes(chip.dataset.value)) chip.click();
+  });
+
+  updateProgress();
+}
+
+async function loadAndPrefillForm(eventId){
+  try {
+    const snap = await get(eventRef(eventId));
+    if (snap.exists()) {
+      const data = snap.val();
+      fillForm(data);
+      if (data.locked) applyLockedState(true);
+    }
+  } catch(err) {
+    console.error(err);
+    showBanner('No se pudieron cargar tus datos guardados por un problema de conexión. Recarga la página antes de continuar para no sobrescribir información previa.', 'error');
+    document.getElementById('submitBtn').disabled = true;
+  }
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  const data = {};
+  new FormData(form).forEach((value, key) => { data[key] = value; });
+  data['papas_aparecer'] = toggles['papas_aparecer'] || 'No';
+  data['padrinos_aparecer'] = toggles['padrinos_aparecer'] || 'No';
+  data['iglesia_hay'] = toggles['iglesia_hay'] || 'No';
+  data['otra_ubicacion_hay'] = toggles['otra_ubicacion_hay'] || 'No';
+  data['cuenta_regresiva'] = toggles['cuenta_regresiva'] || 'No';
+  data['confirmacion'] = toggles['confirmacion'] || 'No';
+  data['vestimenta_aplica'] = toggles['vestimenta_aplica'] || 'No';
+  data['regalos_hay'] = toggles['regalos_hay'] || 'No';
+  data['timeline_hay'] = toggles['timeline_hay'] || 'No';
+  data['avisos_seleccionados'] = Array.from(avisosSeleccionados).join(' · ');
+  data['submitted_at'] = new Date().toISOString();
+  data['locked'] = true;
+
+  try {
+    await set(eventRef(currentEventId), data);
+    applyLockedState(true);
+    showBanner('¡Guardado! Recibimos tus datos correctamente. En breve nos pondremos en contacto para mostrarte los diseños disponibles.', 'success');
+  } catch(err) {
+    console.error(err);
+    alert('Hubo un problema al enviar tus datos. Por favor intenta de nuevo.');
+    btn.disabled = false;
+    btn.textContent = 'Enviar mis datos';
+    return;
+  }
+  btn.disabled = false;
+  btn.textContent = 'Enviar mis datos';
+});
+
+// ADMIN PANEL
+const adminToggleBtn = document.getElementById('adminToggleBtn');
+const adminPanel = document.getElementById('adminPanel');
+const adminCloseBtn = document.getElementById('adminCloseBtn');
+const adminBody = document.getElementById('adminBody');
+const adminSubtitle = document.getElementById('adminSubtitle');
+
+const FIELD_LABELS = {
+  festejado_nombre: 'Festejado(a)',
+  papa_nombre: 'Papá', mama_nombre: 'Mamá',
+  padrinos_nombres: 'Padrinos',
+  iglesia_nombre: 'Iglesia', iglesia_direccion: 'Dirección iglesia',
+  iglesia_fecha: 'Fecha iglesia', iglesia_hora: 'Hora iglesia',
+  salon_nombre: 'Salón', salon_direccion: 'Dirección salón',
+  salon_fecha: 'Fecha salón', salon_hora: 'Hora salón',
+  avisos_seleccionados: 'Avisos seleccionados', avisos_otro: 'Otro aviso',
+  cuenta_regresiva: 'Cuenta regresiva',
+  confirmacion: 'Confirmación',
+  vestimenta_aplica: 'Código de vestimenta', vestimenta_detalle: 'Detalle vestimenta',
+  regalos_hay: 'Mesa de regalos', regalos_frase: 'Frase alternativa',
+  timeline_hay: 'Línea de tiempo', timeline_detalle: 'Detalle línea de tiempo',
+  frase_versiculo: 'Frase / versículo',
+  diseno_opcion: 'Opción de diseño', diseno_referencia: 'Referencia / idea', diseno_colores: 'Colores',
+  papas_aparecer: 'Papás aparecen', padrinos_aparecer: 'Padrinos aparecen', iglesia_hay: 'Hay iglesia',
+  otra_ubicacion_hay: 'Hay otra ubicación'
+};
+
+const longFields = ['padrinos_nombres','avisos_seleccionados','avisos_otro','timeline_detalle','frase_versiculo','diseno_referencia'];
+
+function prettyKey(k){
+  if (FIELD_LABELS[k]) return FIELD_LABELS[k];
+  if (k.startsWith('extra_ubicacion_nombre_')) return 'Ubicación extra ' + k.split('_').pop() + ' — nombre';
+  if (k.startsWith('extra_ubicacion_direccion_')) return 'Ubicación extra ' + k.split('_').pop() + ' — dirección';
+  if (k.startsWith('extra_ubicacion_fecha_')) return 'Ubicación extra ' + k.split('_').pop() + ' — fecha';
+  if (k.startsWith('extra_ubicacion_hora_')) return 'Ubicación extra ' + k.split('_').pop() + ' — hora';
+  if (k.startsWith('regalo_tienda_')) return 'Regalo — tienda ' + k.split('_').pop();
+  if (k.startsWith('regalo_liga_')) return 'Regalo — enlace ' + k.split('_').pop();
+  return k;
+}
+
+async function loadResponses(){
+  adminBody.innerHTML = '<div class="admin-loading">Cargando respuestas...</div>';
+  try {
+    const snap = await get(ref(db, EVENTS_PATH));
+    if (!snap.exists()) {
+      adminSubtitle.textContent = '0 respuestas hasta ahora';
+      adminBody.innerHTML = '<div class="admin-empty">Aún no hay respuestas.<br>Comparte el enlace del formulario con tus clientes.</div>';
+      return;
+    }
+    const items = [];
+    snap.forEach(child => items.push({ key: child.key, data: child.val() }));
+    items.sort((a,b) => new Date(b.data.submitted_at||0) - new Date(a.data.submitted_at||0));
+    adminSubtitle.textContent = items.length + (items.length === 1 ? ' respuesta recibida' : ' respuestas recibidas');
+    adminBody.innerHTML = '';
+    items.forEach(item => adminBody.appendChild(renderCard(item, 'admin')));
+  } catch(err) {
+    console.error(err);
+    adminBody.innerHTML = '<div class="admin-empty">No se pudieron cargar las respuestas. Intenta de nuevo.</div>';
+  }
+}
+
+async function copyToClipboard(text, btn){
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    const original = btn.textContent;
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = original; btn.classList.remove('copied'); }, 1400);
+  } catch(e) {
+    alert('No se pudo copiar. Selecciona el texto manualmente.');
+  }
+}
+
+function buildCopyAllText(data){
+  return Object.keys(data)
+    .filter(k => !['submitted_at','locked'].includes(k) && data[k] && String(data[k]).trim() !== '')
+    .map(k => `${prettyKey(k)}: ${data[k]}`)
+    .join('\n');
+}
+
+function renderCard({key, data}, mode = 'admin'){
+  const card = document.createElement('div');
+  card.className = 'response-card';
+
+  const head = document.createElement('div');
+  head.className = 'response-card-head';
+  const name = document.createElement('h3');
+  name.textContent = data.festejado_nombre || 'Sin nombre';
+  const date = document.createElement('div');
+  date.className = 'response-date';
+  try {
+    date.textContent = new Date(data.submitted_at).toLocaleString('es-MX', {dateStyle:'medium', timeStyle:'short'});
+  } catch(e) { date.textContent = ''; }
+  head.appendChild(name);
+  head.appendChild(date);
+  card.appendChild(head);
+
+  const grid = document.createElement('div');
+  grid.className = 'response-grid';
+
+  Object.keys(data).forEach(k => {
+    if (k === 'submitted_at' || k === 'festejado_nombre' || k === 'locked') return;
+    const val = data[k];
+    if (!val || val.toString().trim() === '') return;
+    const label = prettyKey(k);
+    const item = document.createElement('div');
+    item.className = 'resp-item' + (longFields.includes(k) ? ' full' : '');
+    const kEl = document.createElement('span');
+    kEl.className = 'k';
+    kEl.textContent = label;
+    const vEl = document.createElement('span');
+    vEl.className = 'v';
+    vEl.textContent = val;
+    item.appendChild(kEl);
+    item.appendChild(vEl);
+    if (mode === 'view') {
+      const copyBtn = document.createElement('button');
+      copyBtn.type = 'button';
+      copyBtn.className = 'copy-btn';
+      copyBtn.textContent = 'Copiar';
+      copyBtn.addEventListener('click', () => copyToClipboard(String(val), copyBtn));
+      item.appendChild(copyBtn);
+    }
+    grid.appendChild(item);
+  });
+
+  card.appendChild(grid);
+
+  if (mode === 'admin') {
+    const delBtn = document.createElement('button');
+    delBtn.className = 'delete-btn';
+    delBtn.textContent = 'Eliminar respuesta';
+    delBtn.style.marginTop = '14px';
+    delBtn.addEventListener('click', async () => {
+      if (!confirm('¿Eliminar esta respuesta?')) return;
+      try {
+        await remove(eventRef(key));
+        loadResponses();
+      } catch(e) { alert('No se pudo eliminar.'); }
+    });
+    card.appendChild(delBtn);
+  } else if (mode === 'view') {
+    const copyAllBtn = document.createElement('button');
+    copyAllBtn.type = 'button';
+    copyAllBtn.className = 'copy-all-btn';
+    copyAllBtn.textContent = 'Copiar toda la información';
+    copyAllBtn.addEventListener('click', () => copyToClipboard(buildCopyAllText(data), copyAllBtn));
+    card.appendChild(copyAllBtn);
+  }
+
+  return card;
+}
+
+async function renderViewOnly(eventId){
+  const container = document.getElementById('viewOnlyBody');
+  container.innerHTML = '<div class="admin-loading">Cargando...</div>';
+  try {
+    const snap = await get(eventRef(eventId));
+    if (!snap.exists()) {
+      container.innerHTML = '<div class="admin-empty">No se encontró ningún evento con ese identificador.<br>Verifica el enlace.</div>';
+      return;
+    }
+    container.innerHTML = '';
+    container.appendChild(renderCard({ key: eventId, data: snap.val() }, 'view'));
+  } catch(err) {
+    console.error(err);
+    container.innerHTML = '<div class="admin-empty">No se pudo cargar este evento. Intenta de nuevo más tarde.</div>';
+  }
+}
+
+adminToggleBtn.addEventListener('click', () => {
+  adminPanel.classList.add('show');
+  loadResponses();
+});
+adminCloseBtn.addEventListener('click', () => {
+  adminPanel.classList.remove('show');
+});
+
+// --- Ruteo por URL: ?view=id muestra el detalle de solo lectura, ---
+// --- ?id=id llena/edita ese evento, sin ninguno de los dos se genera uno nuevo ---
+async function bootstrap(){
+  const params = new URLSearchParams(location.search);
+  const viewId = params.get('view');
+  const formId = params.get('id');
+
+  if (viewId) {
+    document.getElementById('formLive').style.display = 'none';
+    document.getElementById('viewOnlyScreen').style.display = 'block';
+    await renderViewOnly(viewId);
+    return;
+  }
+
+  currentEventId = formId || await generateUniqueId();
+  if (!formId) {
+    history.replaceState(null, '', '?id=' + currentEventId);
+  }
+  await loadAndPrefillForm(currentEventId);
+}
+
+bootstrap();
+</script>
+
+</body>
+</html>
