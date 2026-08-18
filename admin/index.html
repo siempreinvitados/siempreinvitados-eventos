@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin de Invitaciones</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <div id="toast" class="toast hidden" role="status"></div>
+
+    <!-- ═══════════════ Picker: busca la invitación ═══════════════ -->
+    <main id="view-picker" class="view hidden">
+        <div class="picker-wrap">
+            <h1>Panel de Invitaciones</h1>
+            <p class="picker-sub">Escribe el ID o el nombre de la invitación que quieres administrar.</p>
+            <div class="search-box">
+                <input type="text" id="invitationSearch" placeholder="Ej. gali, o “XV Años”…" autocomplete="off" />
+            </div>
+            <div id="searchResults" class="search-results hidden"></div>
+        </div>
+    </main>
+
+    <!-- ═══════════════ Login por invitación ═══════════════ -->
+    <main id="view-login" class="view hidden">
+        <div class="auth-wrap">
+            <div class="login-card" id="loginCard"></div>
+        </div>
+    </main>
+
+    <!-- ═══════════════ Dashboard ═══════════════ -->
+    <main id="view-dashboard" class="view hidden">
+        <header class="dash-header">
+            <div class="dash-id">
+                <div class="dash-logo" id="dashLogo"></div>
+                <div id="dashTitle"></div>
+            </div>
+            <div class="dash-actions">
+                <a class="btn-ghost" id="dashSiteLink" href="#" target="_blank" rel="noopener">Ver invitación</a>
+                <a class="btn-ghost" href="index.html">Cambiar invitación</a>
+                <button class="btn-ghost" id="logoutBtn" type="button">Cerrar sesión</button>
+            </div>
+        </header>
+
+        <div class="dash-body">
+
+            <div class="error-banner hidden" id="dashError">
+                <p class="error-msg"></p>
+                <button class="btn-primary" id="retryBtn" type="button">Reintentar</button>
+            </div>
+
+            <section class="stats-grid" id="statsGrid"></section>
+
+            <section class="table-section" id="tableSection">
+                <div class="table-toolbar hidden">
+                    <input type="search" id="searchInput" placeholder="Buscar por nombre..."
+                        aria-label="Buscar por nombre" />
+                    <div class="filter-group" id="filterGroup">
+                        <button class="filter-btn active" data-filter="todos" type="button">Todos</button>
+                        <button class="filter-btn" data-filter="si" type="button">Sí</button>
+                        <button class="filter-btn" data-filter="no" type="button">No</button>
+                    </div>
+                    <button class="btn-export" id="exportBtn" type="button">Exportar CSV</button>
+                </div>
+                <div id="tableWrap"></div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- config de Firebase compartido: el legacy (proyecto viejo "bautizo-sofia",
+         usado por la conexión principal de este panel + gali/sofi) y el de
+         bautizo2/bautizo/miguel-sebastian (proyecto nuevo "siempre-invitados")
+         — sin defer, antes del módulo, para que window.firebaseConfig* ya
+         exista cuando app.js corra. En este repo (a diferencia de
+         bautizo-sofia) shared/ vive dentro de mi-bautizo/, no en la raíz. -->
+    <script src="../mi-bautizo/shared/firebase-config.legacy.js"></script>
+    <script src="../mi-bautizo/shared/firebase-config.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+
+</html>
