@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Página no encontrada — Siempre Invitados</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Quicksand:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="si-404">
+    <div class="si-404-card">
+        <a href="./" class="si-logo">Siempre <em>Invitados</em></a>
+        <p class="eyebrow">Siempre especial, siempre invitados</p>
+        <p class="si-404-code">404</p>
+        <h1>Esta invitación se perdió en el camino</h1>
+        <p>La página que buscas no existe o cambió de dirección.</p>
+        <div class="si-404-ctas">
+            <a class="btn-primary" href="/">Volver al inicio</a>
+            <a class="btn-outline"
+                href="https://wa.me/5215658936778?text=Hola%2C%20me%20ayudas%20a%20crear%20una%20invitaci%C3%B3n%20para%20mi%20evento."
+                target="_blank" rel="noopener">Escríbenos por WhatsApp</a>
+        </div>
+    </div>
+
+    <script>
+        /* Truco estándar para rutas tipo path en GitHub Pages (100% estático,
+           sin rewrites de servidor): si la ruta pedida es .../admin/<id>,
+           la reescribimos como .../admin/?id=<id> antes de que cargue nada —
+           así admin/gali funciona como acceso directo, igual que admin/?id=gali.
+           Copiado tal cual del 404.html actual de la raíz — es la única parte
+           funcional de este archivo, el resto de este 404 es solo diseño. */
+        (function () {
+            var m = location.pathname.match(/^(.*\/admin)\/([^\/]+)\/?$/);
+            if (m) {
+                location.replace(m[1] + '/?id=' + encodeURIComponent(m[2]));
+            }
+        })();
+    </script>
+</body>
+
+</html>

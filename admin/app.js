@@ -479,7 +479,7 @@ function renderTable() {
                         <tr>
                             <td data-label="Nombre">${escapeHtml(g.nombre || '')}</td>
                             <td data-label="Personas">${escapeHtml(g.personas ?? 0)}</td>
-                            <td data-label="Fecha">${escapeHtml(g.date || '')}</td>
+                            <td data-label="Fecha de confirmación">${escapeHtml(g.date || '')}</td>
                             <td data-label="Asiste"><span class="badge ${asiste ? 'badge-yes' : 'badge-no'}">${asiste ? 'Sí' : 'No'}</span></td>
                         </tr>
                     `;

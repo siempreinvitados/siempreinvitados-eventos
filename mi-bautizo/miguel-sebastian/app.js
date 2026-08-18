@@ -378,6 +378,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeCal
    ══════════════════════════════════════════════════════════════ */
 const RSVP_KEY = 'rsvp_5vu4o_data';
 let rsvpChoice = null, guestCount = 1, currentStep = 0;
+let editingRecordId = null, previousRecord = null;
 
 (function () {
     const raw = localStorage.getItem(RSVP_KEY);
@@ -386,6 +387,13 @@ let rsvpChoice = null, guestCount = 1, currentStep = 0;
         renderAlreadyConfirmed(JSON.parse(raw));
     } catch (e) { /* dato corrupto — se ignora, se deja ver el formulario de nuevo */ }
 })();
+
+/* Id corto por respuesta: 5 caracteres base36 tomados del timestamp, sin
+   depender de leer Firebase antes (alcance: la lista de esta invitación,
+   no todo el repo — mismo estilo que INVITATION_ID). */
+function generateRsvpId() {
+    return Date.now().toString(36).slice(-5).padStart(5, '0');
+}
 
 function renderAlreadyConfirmed(data) {
     const stepper = document.getElementById('rsvpStepper');
@@ -399,7 +407,43 @@ function renderAlreadyConfirmed(data) {
             ? `${data.nombre} confirmó el ${data.date} que sí asistirá, con ${data.personas} ${data.personas === 1 ? 'persona' : 'personas'}.`
             : `${data.nombre} confirmó el ${data.date} que no podrá asistir.`;
     }
+    const editBtn = document.getElementById('rsvpEditBtn');
+    if (editBtn) editBtn.style.display = data.id ? '' : 'none';
     already.style.display = 'block';
+}
+
+/* Reabre el wizard prellenado con la respuesta ya guardada. Solo entradas
+   con id (creadas después de este cambio) son editables — una respuesta
+   vieja (array sin id) no tiene una ruta segura a la que sobreescribir. */
+function startEditRSVP() {
+    const raw = localStorage.getItem(RSVP_KEY);
+    if (!raw) return;
+    let data;
+    try { data = JSON.parse(raw); } catch (e) { return; }
+    if (!data.id) return;
+
+    editingRecordId = data.id;
+    previousRecord = { personas: data.personas, asiste: data.asiste };
+
+    document.getElementById('rsvpAlreadyConfirmed').style.display = 'none';
+    const stepper = document.getElementById('rsvpStepper');
+    stepper.style.display = '';
+
+    const asisteVal = Number(data.asiste) === 1 ? 'si' : 'no';
+    selectAttend(asisteVal);
+    guestCount = Math.max(1, Math.min(20, Number(data.personas) || 1));
+    document.getElementById('guestNum').textContent = guestCount;
+
+    const isAnon = data.nombre === 'Anónimo(a)';
+    document.getElementById('rsvpAnon').checked = isAnon;
+    toggleAnon(document.getElementById('rsvpAnon'));
+    if (!isAnon) document.getElementById('rsvpName').value = data.nombre;
+
+    for (let i = 0; i < 3; i++) { const dot = document.getElementById('dot' + i); dot.classList.remove('active', 'done'); }
+    document.getElementById('step' + currentStep).classList.remove('active');
+    currentStep = 0;
+    document.getElementById('step0').classList.add('active');
+    document.getElementById('dot0').classList.add('active');
 }
 
 function selectAttend(val) {
@@ -443,37 +487,56 @@ function submitRSVP() {
     const rawName = document.getElementById('rsvpName').value.trim();
     const name = isAnon || !rawName ? 'Anónimo(a)' : rawName;
     const asiste = rsvpChoice === 'si';
+    const isEdit = !!editingRecordId;
 
-    /* Una sola respuesta por navegador: RSVP_KEY se guarda siempre (haya
-       o no Firebase disponible) para bloquear reenvíos; el registro en
-       Firebase (transactions, asiste 0/1, fecha DD/MM/YYYY HH:mm armada
-       a mano — misma mecánica que gali/app.js) solo ocurre si db existe. */
-    if (!localStorage.getItem(RSVP_KEY)) {
+    /* Una sola respuesta por navegador salvo edición explícita: RSVP_KEY
+       se guarda siempre (haya o no Firebase disponible) para bloquear
+       reenvíos; el registro en Firebase (asiste 0/1, fecha DD/MM/YYYY
+       HH:mm armada a mano — misma mecánica que gali/app.js) solo ocurre
+       si db existe. Al editar, se sobreescribe la misma entrada
+       (asistentes/{id}) y se ajustan los contadores por delta contra la
+       respuesta anterior en vez de sumarlos de nuevo. */
+    if (isEdit || !localStorage.getItem(RSVP_KEY)) {
         const now = new Date();
         const formattedDate = `${padN(now.getDate())}/${padN(now.getMonth() + 1)}/${now.getFullYear()} ${padN(now.getHours())}:${padN(now.getMinutes())}`;
         const record = { nombre: name, personas: guestCount, date: formattedDate, asiste: asiste ? 1 : 0 };
+        const recordId = isEdit ? editingRecordId : generateRsvpId();
 
         if (db) {
             const base = db.ref(`invitations/${INVITATION_ID}/contadores`);
-            base.child('asistentes').transaction(c => {
-                const arr = Array.isArray(c) ? c : [];
-                arr.push(record);
-                return arr;
-            });
-            if (asiste) {
+            base.child('asistentes').child(recordId).set(record);
+
+            if (isEdit) {
+                const wasAsiste = Number(previousRecord.asiste) === 1;
+                const wasPersonas = Number(previousRecord.personas) || 0;
+                if (wasAsiste && asiste) {
+                    base.child('confirmados').transaction(c => (c || 0) + (guestCount - wasPersonas));
+                } else if (wasAsiste && !asiste) {
+                    base.child('confirmados').transaction(c => (c || 0) - wasPersonas);
+                    base.child('noConfirmados').transaction(c => (c || 0) + 1);
+                } else if (!wasAsiste && asiste) {
+                    base.child('noConfirmados').transaction(c => (c || 0) - 1);
+                    base.child('confirmados').transaction(c => (c || 0) + guestCount);
+                }
+            } else if (asiste) {
                 base.child('confirmados').transaction(c => (c || 0) + guestCount);
             } else {
                 base.child('noConfirmados').transaction(c => (c || 0) + 1);
             }
         }
 
-        try { localStorage.setItem(RSVP_KEY, JSON.stringify(record)); } catch (e) { /* localStorage lleno/bloqueado — el registro en Firebase ya se hizo, solo no persiste el aviso local */ }
+        try { localStorage.setItem(RSVP_KEY, JSON.stringify({ id: recordId, ...record })); } catch (e) { /* localStorage lleno/bloqueado — el registro en Firebase ya se hizo, solo no persiste el aviso local */ }
     }
+
+    editingRecordId = null;
+    previousRecord = null;
 
     document.getElementById('rsvpStepper').style.display = 'none';
     document.getElementById('successName').textContent = name;
     document.getElementById('successSub').innerHTML = asiste
-        ? 'Tu confirmación fue registrada.<br>Mi familia y yo te esperamos para celebrar juntos este gran día.'
+        ? (isEdit
+            ? 'Tu confirmación fue actualizada.<br>Mi familia y yo te esperamos para celebrar juntos este gran día.'
+            : 'Tu confirmación fue registrada.<br>Mi familia y yo te esperamos para celebrar juntos este gran día.')
         : 'Lamentamos que no puedas acompañarnos.<br>Gracias por avisarnos, te extrañaremos.';
     document.getElementById('successMsg').style.display = 'block';
     if (typeof gsap !== 'undefined') gsap.fromTo('#successMsg', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .8, ease: 'power2.out' });
