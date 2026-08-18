@@ -49,11 +49,11 @@ try {
    las tengas, mismos nombres de archivo. Mientras un archivo no exista,
    se muestra el emoji de reemplazo. */
 const galleryImages = [
-    { url: './resources/gallery/foto1.jpg', emoji: '🧸' },
-    { url: './resources/gallery/foto2.jpg', emoji: '🤍' },
-    { url: './resources/gallery/foto3.jpg', emoji: '🩵' },
-    { url: './resources/gallery/foto4.jpg', emoji: '⭐' },
-    { url: './resources/gallery/foto5.jpg', emoji: '⭐' },
+    { url: './resources/gallery/foto1.jpg?v=1', emoji: '🧸' },
+    { url: './resources/gallery/foto2.jpg?v=1', emoji: '🤍' },
+    { url: './resources/gallery/foto3.jpg?v=1', emoji: '🩵' },
+    { url: './resources/gallery/foto4.jpg?v=1', emoji: '⭐' },
+    { url: './resources/gallery/foto5.jpg?v=1', emoji: '⭐' },
 ];
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
