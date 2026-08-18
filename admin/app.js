@@ -34,6 +34,12 @@ const bautizo2Db = getDatabase(bautizo2App);
    importa si la invitación es local o descubierta en Firebase.
    ══════════════════════════════════════════════════════════════ */
 async function readRaw(path, dbRef = db) {
+    // dbRef puede llegar null explícito (proyecto legacy sin config, ver
+    // arriba) — el default de arriba solo cubre "undefined", no "null", así
+    // que sin este guard ref(null, path) truena. Tratarlo como "sin datos"
+    // deja que cualquier llamador (loadFirebaseInvitations, resolveInvitation)
+    // simplemente pase al siguiente proyecto, sin try/catch propio.
+    if (!dbRef) return null;
     const snap = await get(ref(dbRef, path));
     return snap.exists() ? snap.val() : null;
 }
@@ -105,6 +111,8 @@ function avatarHtml(branding) {
      invitations/{id}/nombre        -> string, para buscarla
      invitations/{id}/fecha         -> fecha del evento (ISO)
      invitations/{id}/caratula      -> URL de imagen, usada como avatar
+     invitations/{id}/url           -> link al sitio real de la invitación,
+                                        usado por el botón "Ver invitación"
      invitations/{id}/password      -> string plano
      invitations/{id}/branding      -> {primary, primaryDark, accent}
      invitations/{id}/contadores/{visitas,confirmados,noConfirmados,asistentes}
@@ -127,7 +135,7 @@ function normalizeFirebaseInvitation(id, raw, dbRef) {
         id,
         db: dbRef,
         label: raw.nombre || id,
-        siteUrl: null, // el esquema nuevo no define un link propio a la invitación
+        siteUrl: raw.url || null,
         eventDate: parseEventDate(raw.fecha),
         branding: {
             primary: branding.primary || '#6c63ff',
@@ -311,7 +319,7 @@ function renderPicker() {
         input.placeholder = 'Cargando invitaciones…';
     } else {
         input.disabled = false;
-        input.placeholder = 'Ej. gali, o “XV Años”…';
+        input.placeholder = 'Buscar por ID o por nombre';
     }
     input.focus();
 }
@@ -323,6 +331,9 @@ function renderLogin(descriptor, branding) {
     showView('login');
     const card = document.getElementById('loginCard');
     const notConfigured = descriptor.paths.password == null;
+    const siteLinkHtml = descriptor.siteUrl
+        ? `<a class="btn-ghost" href="${escapeHtml(descriptor.siteUrl)}" target="_blank" rel="noopener">Ver invitación</a>`
+        : '';
 
     if (notConfigured) {
         const anyPath = Object.values(descriptor.paths).find(p => p != null);
@@ -332,7 +343,10 @@ function renderLogin(descriptor, branding) {
             <h2>${escapeHtml(branding.label)}</h2>
             <p class="login-msg">El acceso a esta invitación aún no está configurado.
                 Agrega una contraseña en Firebase (<code>${escapeHtml(prefix)}/password</code>) para habilitarlo.</p>
-            <a class="btn-secondary" href="index.html">← Volver</a>
+            <div class="login-actions">
+                ${siteLinkHtml}
+                <a class="btn-secondary" href="index.html">← Volver</a>
+            </div>
         `;
         return;
     }
@@ -346,7 +360,10 @@ function renderLogin(descriptor, branding) {
             <button type="submit" class="btn-primary">Entrar</button>
             <div class="login-error hidden" id="loginError"></div>
         </form>
-        <a class="btn-link" href="index.html">← Volver</a>
+        <div class="login-actions">
+            ${siteLinkHtml}
+            <a class="btn-link" href="index.html">← Volver</a>
+        </div>
     `;
 
     const form = document.getElementById('loginForm');
@@ -386,33 +403,31 @@ const STAT_DEFS = [
     { key: 'visitas', label: 'Visitas', icon: '👀' },
     { key: 'confirmados', label: 'Confirmados', icon: '✅' },
     { key: 'noConfirmados', label: 'No Confirmados', icon: '🙁' },
-    { key: 'totalRespuestas', label: 'Total Respuestas', icon: '📋' },
 ];
 
 function renderStatsSkeleton() {
     document.getElementById('statsGrid').innerHTML = STAT_DEFS.map(s => `
         <div class="stat-card">
             <div class="stat-icon">${s.icon}</div>
-            <div class="stat-label">${s.label}</div>
-            <div class="stat-value"><span class="skeleton">&nbsp;</span></div>
+            <div class="stat-body">
+                <div class="stat-label">${s.label}</div>
+                <div class="stat-value"><span class="skeleton">&nbsp;</span></div>
+            </div>
         </div>
     `).join('');
 }
 
 function renderStats(data) {
-    const totalRespuestas = data.asistentes.available
-        ? { available: true, value: data.asistentes.value.length }
-        : { available: false, value: null };
-    const values = { ...data, totalRespuestas };
-
     document.getElementById('statsGrid').innerHTML = STAT_DEFS.map(s => {
-        const field = values[s.key];
+        const field = data[s.key];
         const display = field.available ? field.value : 'No disponible';
         return `
             <div class="stat-card${field.available ? '' : ' stat-unavailable'}">
                 <div class="stat-icon">${s.icon}</div>
-                <div class="stat-label">${s.label}</div>
-                <div class="stat-value">${display}</div>
+                <div class="stat-body">
+                    <div class="stat-label">${s.label}</div>
+                    <div class="stat-value">${display}</div>
+                </div>
             </div>
         `;
     }).join('');
@@ -423,11 +438,9 @@ let currentFilter = 'todos';
 
 function setupTable(asistentesField) {
     const toolbar = document.querySelector('.table-toolbar');
-    const exportBtn = document.getElementById('exportBtn');
 
     if (!asistentesField.available) {
         toolbar.classList.add('hidden');
-        exportBtn.disabled = true;
         currentGuests = [];
         document.getElementById('tableWrap').innerHTML =
             '<div class="empty-state">Esta invitación no registra asistentes en Firebase todavía.</div>';
@@ -436,7 +449,6 @@ function setupTable(asistentesField) {
 
     toolbar.classList.remove('hidden');
     currentGuests = asistentesField.value;
-    exportBtn.disabled = !currentGuests.some(g => Number(g.asiste) === 1);
     renderTable();
 }
 
@@ -475,24 +487,6 @@ function renderTable() {
             </tbody>
         </table>
     `;
-}
-
-function exportCsv(id) {
-    const confirmed = currentGuests.filter(g => Number(g.asiste) === 1);
-    if (confirmed.length === 0) return;
-    const header = ['Nombre', 'Personas', 'Fecha'];
-    const rows = confirmed.map(g => [g.nombre || '', g.personas ?? 0, g.date || '']);
-    const csv = '﻿' + [header, ...rows]
-        .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-        .join('\r\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `confirmados-${id}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(a.href);
 }
 
 async function renderDashboard(descriptor, branding) {
@@ -580,7 +574,7 @@ async function initFirebaseInvitations() {
     const input = document.getElementById('invitationSearch');
     if (document.getElementById('view-picker').classList.contains('hidden')) return;
     input.disabled = false;
-    input.placeholder = 'Ej. gali, o “XV Años”…';
+    input.placeholder = 'Buscar por ID o por nombre';
     if (input.value.trim()) renderSearchResults();
 }
 
@@ -596,7 +590,6 @@ function initDashboardControls() {
         currentFilter = btn.dataset.filter;
         renderTable();
     });
-    document.getElementById('exportBtn').addEventListener('click', () => exportCsv(getInvitationIdFromUrl()));
     document.getElementById('logoutBtn').addEventListener('click', () => logout(getInvitationIdFromUrl()));
     document.getElementById('retryBtn').addEventListener('click', () => route());
 }

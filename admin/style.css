@@ -27,6 +27,10 @@
     box-sizing: border-box;
 }
 
+html, body {
+    overflow-x: hidden;
+}
+
 body {
     font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
     background: linear-gradient(180deg, var(--bg), #eceef8 100%);
@@ -229,6 +233,11 @@ button, input {
     font-size: 14px;
     margin: 14px 0 20px;
     line-height: 1.55;
+    overflow-wrap: break-word;
+}
+
+.login-msg code {
+    word-break: break-all;
 }
 
 .login-card form {
@@ -291,6 +300,19 @@ button, input {
     color: var(--brand-primary);
 }
 
+.login-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.login-actions .btn-secondary,
+.login-actions .btn-link {
+    margin-top: 0;
+}
+
 /* ── Dashboard header ── */
 .dash-header {
     display: flex;
@@ -310,6 +332,7 @@ button, input {
     display: flex;
     align-items: center;
     gap: 12px;
+    min-width: 0;
 }
 
 .dash-logo {
@@ -335,6 +358,8 @@ button, input {
 #dashTitle {
     font-size: 17px;
     font-weight: 700;
+    overflow-wrap: break-word;
+    min-width: 0;
 }
 
 .dash-actions {
@@ -369,7 +394,7 @@ button, input {
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
     margin-bottom: 28px;
 }
@@ -379,23 +404,38 @@ button, input {
     border-radius: var(--radius-lg);
     padding: 20px;
     box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 16px;
 }
 
 .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--brand-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 22px;
-    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+
+.stat-body {
+    min-width: 0;
 }
 
 .stat-label {
     color: var(--text-mute);
     font-size: 13px;
-    margin-bottom: 6px;
+    margin-bottom: 2px;
 }
 
 .stat-value {
-    font-size: 30px;
+    font-size: 26px;
     font-weight: 700;
     color: var(--brand-primary-dark);
+    line-height: 1.2;
 }
 
 .stat-unavailable .stat-value {
@@ -477,27 +517,6 @@ button, input {
     color: #fff;
 }
 
-.btn-export {
-    background: var(--brand-accent);
-    color: var(--brand-primary-dark);
-    border: none;
-    padding: 10px 16px;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.btn-export:disabled {
-    opacity: .5;
-    cursor: default;
-}
-
-.btn-export:hover:not(:disabled) {
-    opacity: .85;
-}
-
 /* ── Guest table ── */
 .guest-table {
     width: 100%;
@@ -572,11 +591,30 @@ button, input {
 /* ── Responsive table: se apila en tarjetas en móvil ── */
 @media (max-width: 640px) {
     .dash-header {
+        flex-direction: column;
+        align-items: flex-start;
         padding: 14px 16px;
+    }
+
+    .dash-id,
+    .dash-actions {
+        width: 100%;
     }
 
     .dash-body {
         padding: 20px 14px 48px;
+    }
+
+    /* Visitas ocupa todo el ancho; Confirmados/No Confirmados quedan
+       50/50 debajo — solo en móvil, en desktop siguen las 3 columnas
+       parejas de arriba. Se apoya en el orden fijo de STAT_DEFS
+       (visitas siempre primero) en vez de depender de una clase nueva. */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stats-grid .stat-card:first-child {
+        grid-column: 1 / -1;
     }
 
     .guest-table thead {
@@ -602,9 +640,11 @@ button, input {
         border: none;
         padding: 8px 0;
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
-        gap: 12px;
+        gap: 4px 12px;
+        overflow-wrap: anywhere;
     }
 
     .guest-table td::before {
@@ -612,5 +652,6 @@ button, input {
         color: var(--text-mute);
         font-size: 12px;
         font-weight: 600;
+        flex-shrink: 0;
     }
 }
