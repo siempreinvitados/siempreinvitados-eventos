@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Bautizo — Miguel Sebastián</title>
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Mi Bautizo — Miguel Sebastián">
+    <meta property="og:description" content="Acompáñanos a celebrar este día tan especial.">
+    <meta property="og:url" content="https://www.siempreinvitados.com/mi-bautizo/miguel-sebastian/">
+    <meta property="og:image" content="https://www.siempreinvitados.com/mi-bautizo/miguel-sebastian/resources/imgs/portada.jpg">
+    <meta property="og:image:width" content="480">
+    <meta property="og:image:height" content="253">
+    <meta property="og:site_name" content="Siempre Invitados">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Mi Bautizo — Miguel Sebastián">
+    <meta name="twitter:description" content="Acompáñanos a celebrar este día tan especial.">
+    <meta name="twitter:image" content="https://www.siempreinvitados.com/mi-bautizo/miguel-sebastian/resources/imgs/portada.jpg">
+
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%B8%3C/text%3E%3C/svg%3E">
+
+    <link rel="stylesheet" href="style.css">
+    <!-- config de Firebase compartido (proyecto "siempre-invitados", propio
+         de bautizo2 — no el mismo que gali/sofi/admin) — sin defer y primero
+         de todos: es local/minúsculo, así queda listo antes que cualquier
+         otro script sin depender del orden entre scripts diferidos.
+         Ver README.md para el porqué de window.firebaseConfig. -->
+    <script src="../shared/firebase-config.js"></script>
+    <!-- auto-hospedado (antes cdnjs): evita bloquear el render en conexiones
+         lentas y quita una dependencia de red externa -->
+    <script src="resources/vendor/gsap.min.js" defer></script>
+    <!-- Firebase compat SDK, mismo criterio que gali/app.js. defer + orden en
+         el documento (antes de app.js) garantiza que "firebase" ya exista
+         cuando app.js corra -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js" defer></script>
+</head>
+
+<body>
+
+    <div id="snap-container">
+
+        <!-- ══ PANTALLA 1 · PORTADA ══ -->
+        <section class="screen screen-portada" id="screen-portada">
+            <div class="deco-marco marco-top"><img src="resources/imgs/marco_a.png" alt="" aria-hidden="true"></div>
+            <div class="deco-marco marco-bottom"><img src="resources/imgs/marco_b.png" alt="" aria-hidden="true">
+            </div>
+            <img class="deco-bow bow-top" src="resources/imgs/ribbon-bow.png" alt="" aria-hidden="true">
+
+            <div class="p1-content">
+                <p class="p1-eyebrow">ACOMPÁÑANOS A CELEBRAR EL</p>
+                <h1 class="p1-title">BAUTIZO</h1>
+                <p class="p1-subtitle">&amp; PRIMER AÑITO</p>
+                <p class="p1-name">Miguel Sebastián</p>
+            </div>
+
+            <img class="p1-mascot" src="resources/imgs/oso.png" alt="Osito" aria-hidden="true">
+
+            <div class="scroll-hint" id="scrollHint" aria-hidden="true">
+                <img class="scroll-hint-hand" src="resources/imgs/hand.svg" alt="" aria-hidden="true">
+                <span class="scroll-hint-label">Desliza</span>
+            </div>
+        </section>
+
+        <!-- ══ PANTALLA 2 · DEDICATORIA ══ -->
+        <section class="screen screen-dedicatoria" id="screen-dedicatoria">
+            <div class="deco-marco marco-top"><img src="resources/imgs/marco_a.png" alt="" aria-hidden="true"></div>
+            <div class="deco-marco marco-bottom"><img src="resources/imgs/marco_b.png" alt="" aria-hidden="true">
+            </div>
+            <img class="deco-bow bow-top bow-small" src="resources/imgs/ribbon-bow.png" alt="" aria-hidden="true">
+
+            <div class="p2-content">
+                <p class="ded-line">DOY GRACIAS<br><span class="accent">A DIOS NUESTRO SEÑOR</span><br>POR DARME EL
+                    DON DE LA VIDA</p>
+                <p class="ded-line"><span class="accent">A MIS PADRES</span><br>POR ESPERARME CON AMOR Y<br>RECIBIRME
+                    CON ALEGRÍA<br><span class="ded-names">Miguel Castañeda &amp; Adilene Fragoso</span></p>
+                <p class="ded-line"><span class="accent">A MIS PADRINOS</span><br>POR GUIARME EN EL CAMINO DE LA VIDA
+                    <br><span class="ded-names">Carlos Castañeda &amp; Silvia Castañeda</span></p>
+                <p class="ded-line">Y <span class="accent">A TI</span> POR ACOMPAÑARME EN EL DÍA MÁS<br>IMPORTANTE DE
+                    MI VIDA</p>
+            </div>
+
+            <img class="p2-mascot" src="resources/imgs/oso.png" alt="Osito" aria-hidden="true">
+        </section>
+
+        <!-- ══ PANTALLA 3 · EVENTO ══ -->
+        <section class="screen screen-evento" id="screen-evento">
+            <div class="deco-marco marco-top"><img src="resources/imgs/marco_a.png" alt="" aria-hidden="true"></div>
+            <div class="deco-marco marco-bottom"><img src="resources/imgs/marco_b.png" alt="" aria-hidden="true">
+            </div>
+            <span class="silver-line line-a" aria-hidden="true"></span>
+            <span class="silver-line line-b" aria-hidden="true"></span>
+
+            <div class="p3-content">
+                <div class="ev3-reveal icon-dove-chalice">
+                    <img src="resources/imgs/dove.svg" class="icon-dove" alt="" aria-hidden="true">
+                </div>
+                <p class="ev3-reveal ev3-intro">ACOMPÁÑANOS A FESTEJAR EL DÍA</p>
+                <p class="ev3-reveal ev3-month">Octubre</p>
+                <div class="ev3-reveal ev3-daterow">
+                    <span class="ev3-day-name">SÁBADO</span>
+                    <span class="ev3-day-num">17</span>
+                    <span class="ev3-year">2026</span>
+                </div>
+                <div class="ev3-schedule">
+                    <div class="ev3-reveal ev3-block">
+                        <p class="ev3-label">RECEPCIÓN</p>
+                        <p class="ev3-time">1:30 PM</p>
+                    </div>
+                    <span class="ev3-schedule-sep" aria-hidden="true">·</span>
+                    <div class="ev3-reveal ev3-block">
+                        <p class="ev3-label">MISA</p>
+                        <p class="ev3-time">2:00 PM</p>
+                    </div>
+                </div>
+                <a class="ev3-reveal ev3-location" href="https://maps.app.goo.gl/C8rWD4Tnnm3AY9xX8"
+                    target="_blank" rel="noopener noreferrer"
+                    aria-label="Ver ubicación de Finca Santa Isabel en Google Maps">
+                    <img class="ev3-location-img" src="resources/imgs/img_finca.jpg" alt="Finca Santa Isabel">
+                    <div class="ev3-location-body">
+                        <p class="ev3-location-name">Finca Santa Isabel</p>
+                        <p class="ev3-location-addr">Paseo de las Bugambilias S/N, 54600 San Mateo Xoloc, Méx.</p>
+                        <span class="ev3-location-btn">📍 Ver ubicación</span>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- ══ PANTALLA 3.5 · CUENTA REGRESIVA ══ -->
+        <section class="screen screen-cuenta" id="screen-cuenta">
+            <div class="deco-marco marco-top"><img src="resources/imgs/marco_a.png" alt="" aria-hidden="true"></div>
+            <div class="deco-marco marco-bottom"><img src="resources/imgs/marco_b.png" alt="" aria-hidden="true">
+            </div>
+
+            <div class="pcd-content">
+                <img class="cd-reveal cd-mascot" src="resources/imgs/oso.png" alt="Osito" aria-hidden="true">
+                <p class="cd-reveal cd-eyebrow">YA CASI LLEGA EL DÍA</p>
+                <h2 class="cd-reveal cd-heading">Faltan para el gran día</h2>
+                <div class="cd-reveal countdown-wrap">
+                    <div class="countdown-grid">
+                        <div class="cd-unit"><span class="cd-num" id="cd-d">--</span>
+                            <div class="cd-label">días</div>
+                        </div>
+                        <div class="cd-sep">·</div>
+                        <div class="cd-unit"><span class="cd-num" id="cd-h">--</span>
+                            <div class="cd-label">horas</div>
+                        </div>
+                        <div class="cd-sep">·</div>
+                        <div class="cd-unit"><span class="cd-num" id="cd-m">--</span>
+                            <div class="cd-label">minutos</div>
+                        </div>
+                        <div class="cd-sep">·</div>
+                        <div class="cd-unit"><span class="cd-num" id="cd-s">--</span>
+                            <div class="cd-label">segundos</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="cd-reveal btn-calendar" onclick="addToCalendar()">📅 Guardar en mi calendario</button>
+            </div>
+        </section>
+
+        <!-- ══ PANTALLA 4 · GALERÍA ══ -->
+        <section class="screen screen-galeria" id="screen-galeria">
+            <div class="deco-marco marco-top"><img src="resources/imgs/marco_a.png" alt="" aria-hidden="true"></div>
+            <div class="deco-marco marco-bottom"><img src="resources/imgs/marco_b.png" alt="" aria-hidden="true">
+            </div>
+
+            <div class="p4-content">
+                <p class="p4-heading ev3-reveal">NUESTROS MOMENTOS</p>
+                <div class="gallery-grid" id="galleryGrid"></div>
+                <button type="button" class="btn-replay" onclick="replayGallery()">↻ Ver otra vez</button>
+            </div>
+        </section>
+
+        <!-- ══ PANTALLA 4.5 · CONFIRMACIÓN (RSVP) ══ -->
+        <section class="screen screen-rsvp" id="screen-rsvp">
+            <div class="deco-marco marco-top"><img src="resources/imgs/marco_a.png" alt="" aria-hidden="true"></div>
+            <div class="deco-marco marco-bottom"><img src="resources/imgs/marco_b.png" alt="" aria-hidden="true">
+            </div>
+
+            <div class="prsvp-content">
+                <p class="rsvp-reveal rsvp-eyebrow">CONFIRMACIÓN</p>
+                <h2 class="rsvp-reveal rsvp-heading">¿Nos acompañas?</h2>
+
+                <div class="success-msg" id="rsvpAlreadyConfirmed" style="display:none;">
+                    <div class="success-inner">
+                        <div class="success-title">¡Ya confirmaste tu respuesta!</div>
+                        <p class="success-sub" id="rsvpAcDetail"></p>
+                    </div>
+                </div>
+
+                <div class="rsvp-stepper rsvp-reveal" id="rsvpStepper">
+                    <div class="rsvp-step active" id="step0">
+                        <p class="rsvp-step-hint">Por favor confirma tu asistencia</p>
+                        <div class="attend-cards">
+                            <div class="attend-option" id="opt-si" onclick="selectAttend('si')">
+                                <span class="ao-label">Sí asistiré</span>
+                                <span class="ao-sub">¡Allá estaré!</span>
+                            </div>
+                            <div class="attend-option" id="opt-no" onclick="selectAttend('no')">
+                                <span class="ao-label">No podré ir</span>
+                                <span class="ao-sub">Lo siento mucho</span>
+                            </div>
+                        </div>
+                        <div class="stepper-nav">
+                            <div class="step-dot active" id="dot0"></div>
+                            <div class="step-dot" id="dot1"></div>
+                            <div class="step-dot" id="dot2"></div>
+                        </div>
+                        <div class="step-btns">
+                            <button class="btn-next" id="rsvpNextBtn" onclick="goStep(1)">Continuar →</button>
+                        </div>
+                    </div>
+
+                    <div class="rsvp-step" id="step1">
+                        <div class="rsvp-form-fields">
+                            <div class="form-group">
+                                <label class="form-label">Nombre o familia</label>
+                                <input class="form-input" type="text" placeholder="Tu nombre o el de tu familia"
+                                    id="rsvpName">
+                                <label class="anon-label">
+                                    <input type="checkbox" id="rsvpAnon" onchange="toggleAnon(this)">
+                                    <span>Prefiero ser anónimo(a)</span>
+                                </label>
+                            </div>
+                            <div class="form-group" id="guestGroup">
+                                <label class="form-label">¿Cuántos serán?</label>
+                                <div class="guest-counter">
+                                    <button class="counter-btn" onclick="changeGuests(-1)">−</button>
+                                    <span class="counter-num" id="guestNum">1</span>
+                                    <span class="counter-label">personas</span>
+                                    <button class="counter-btn" onclick="changeGuests(1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-btns">
+                            <button class="btn-back" onclick="goStep(0)">← Atrás</button>
+                            <button class="btn-next" onclick="goStep(2)">Revisar →</button>
+                        </div>
+                    </div>
+
+                    <div class="rsvp-step" id="step2">
+                        <div class="confirm-summary" id="confirmSummary"></div>
+                        <button class="btn-confirm" onclick="submitRSVP()">Confirmar Asistencia</button>
+                        <div class="step-btns rsvp-step2-btns">
+                            <button class="btn-back" onclick="goStep(1)">← Editar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="success-msg" id="successMsg">
+                    <div class="success-inner">
+                        <div class="success-title">¡Gracias, <span id="successName"></span>!</div>
+                        <p class="success-sub" id="successSub">Abrimos WhatsApp con tu mensaje de confirmación listo
+                            para enviar a la familia.<br>¡Nos vemos en este día tan especial!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ PANTALLA 5 · DESPEDIDA ══ -->
+        <section class="screen screen-despedida" id="screen-despedida">
+            <div class="deco-marco marco-top"><img src="resources/imgs/marco_a.png" alt="" aria-hidden="true"></div>
+            <div class="deco-marco marco-bottom"><img src="resources/imgs/marco_b.png" alt="" aria-hidden="true">
+            </div>
+
+            <img class="p5-mascot" src="resources/imgs/oso.png" alt="Osito" aria-hidden="true">
+            <p class="p5-title">¡Los Esperamos!</p>
+            <p class="p5-footer">¿Quieres una invitación así para tu evento?, <a href="#"
+                    onclick="openContactModal(); return false;">contactame</a></p>
+        </section>
+
+    </div>
+
+    <!-- Modal: guardar en calendario -->
+    <div class="cal-overlay" id="calModal" onclick="handleCalOverlayClick(event)">
+        <div class="cal-modal-box">
+            <button class="cal-close" onclick="closeCalModal()">×</button>
+            <p class="cal-modal-title">Guardar recordatorio</p>
+            <p class="cal-modal-sub">Se añadirá un recordatorio 7 días antes del evento para que no te pierdas este
+                gran día.</p>
+            <div class="cal-device-instructions">
+                <div class="cal-device-row">
+                    <div class="cal-device-icon android">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M6 18c0 .55.45 1 1 1h1v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h2v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h1c.55 0 1-.45 1-1V8H6v10zm-2.5-9c-.83 0-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5S5 18.33 5 17.5v-7C5 9.67 4.33 9 3.5 9zm17 0c-.83 0-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-7c0-.83-.67-1.5-1.5-1.5zM15.53 2.16l1.3-1.3c.2-.2.2-.51 0-.71-.2-.2-.51-.2-.71 0l-1.48 1.48C13.85 1.23 12.95 1 12 1c-.96 0-1.86.23-2.66.63L7.85.15c-.2-.2-.51-.2-.71 0-.2.2-.2.51 0 .71l1.31 1.31C6.97 3.26 6 5.01 6 7h12c0-1.99-.97-3.75-2.47-4.84zM10 5H9V4h1v1zm5 0h-1V4h1v1z"
+                                fill="#2E7D32" />
+                        </svg>
+                    </div>
+                    <div class="cal-device-text">
+                        <span class="cal-device-label">Android</span>
+                        <span class="cal-device-desc">Se abrirá Google Calendar automáticamente para que guardes el
+                            evento con un solo toque.</span>
+                    </div>
+                </div>
+                <div class="cal-device-row">
+                    <div class="cal-device-icon iphone">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path
+                                d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.4c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.39-1.32 2.76-2.53 3.99zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"
+                                fill="#6A1B9A" />
+                        </svg>
+                    </div>
+                    <div class="cal-device-text">
+                        <span class="cal-device-label">iPhone</span>
+                        <span class="cal-device-desc">Se descargará un archivo de calendario. Solo ábrelo y confirma
+                            para agregar el evento automáticamente.</span>
+                    </div>
+                </div>
+            </div>
+            <button class="cal-confirm-btn" onclick="confirmCalendar()">Agregar al calendario</button>
+        </div>
+    </div>
+
+    <!-- Modal: contacto -->
+    <div class="contact-overlay" id="contactModal" onclick="handleContactOverlayClick(event)">
+        <div class="contact-modal-box">
+            <button class="contact-close" onclick="closeContactModal()">×</button>
+            <span class="contact-modal-icon">✨</span>
+            <p class="contact-modal-title">Crea invitaciones para tu evento</p>
+            <p class="contact-modal-sub">Diseños únicos y personalizados para que tu celebración sea
+                inolvidable.<br>Escríbenos y cuéntanos sobre tu evento.</p>
+            <a class="btn-whatsapp"
+                href="https://wa.me/5215658936778?text=Hola%2C%20me%20ayudas%20a%20crear%20una%20invitaci%C3%B3n%20para%20mi%20evento."
+                target="_blank" rel="noopener noreferrer">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path
+                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
+                </svg>
+                Escríbenos por WhatsApp
+            </a>
+        </div>
+    </div>
+
+    <script src="app.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,2010 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0
+}
+
+/* ── Fuentes auto-alojadas (copiadas de bautizo/, sin CDN externo) ── */
+@font-face {
+    font-family: 'Playfair Display';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('resources/fonts/PlayfairDisplay-Regular.woff2') format('woff2')
+}
+
+@font-face {
+    font-family: 'Playfair Display';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('resources/fonts/PlayfairDisplay-SemiBold.woff2') format('woff2')
+}
+
+@font-face {
+    font-family: 'Playfair Display';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('resources/fonts/PlayfairDisplay-Bold.woff2') format('woff2')
+}
+
+@font-face {
+    font-family: 'Playfair Display';
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url('resources/fonts/PlayfairDisplay-Italic.woff2') format('woff2')
+}
+
+@font-face {
+    font-family: 'Playfair Display';
+    font-style: italic;
+    font-weight: 600;
+    font-display: swap;
+    src: url('resources/fonts/PlayfairDisplay-SemiBoldItalic.woff2') format('woff2')
+}
+
+@font-face {
+    font-family: 'Alex Brush';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('resources/fonts/AlexBrush-Regular.woff2') format('woff2')
+}
+
+@font-face {
+    font-family: 'Quicksand';
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url('resources/fonts/Quicksand-Light.woff2') format('woff2')
+}
+
+@font-face {
+    font-family: 'Quicksand';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('resources/fonts/Quicksand-Regular.woff2') format('woff2')
+}
+
+@font-face {
+    font-family: 'Quicksand';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('resources/fonts/Quicksand-Medium.woff2') format('woff2')
+}
+
+@font-face {
+    font-family: 'Quicksand';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('resources/fonts/Quicksand-SemiBold.woff2') format('woff2')
+}
+
+@font-face {
+    font-family: 'Quicksand';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('resources/fonts/Quicksand-Bold.woff2') format('woff2')
+}
+
+@font-face {
+    font-family: 'Baloo 2';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('resources/fonts/Baloo2-Regular.woff2') format('woff2')
+}
+
+@font-face {
+    font-family: 'Baloo 2';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('resources/fonts/Baloo2-Medium.woff2') format('woff2')
+}
+
+@font-face {
+    font-family: 'Baloo 2';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('resources/fonts/Baloo2-SemiBold.woff2') format('woff2')
+}
+
+@font-face {
+    font-family: 'Baloo 2';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('resources/fonts/Baloo2-Bold.woff2') format('woff2')
+}
+
+@font-face {
+    font-family: 'Baloo 2';
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+    src: url('resources/fonts/Baloo2-ExtraBold.woff2') format('woff2')
+}
+
+/* ── Paleta (misma base azul/plateada que bautizo/, + 2 acentos metálicos nuevos) ── */
+:root {
+    --blue: #3f6fa8;
+    --blue-deep: #1f3f66;
+    --blue-light: #bcd6ef;
+    --powder: #dce9f7;
+    --cream: #f8fafc;
+    --pearl: #eef2f7;
+    --silver: #c7ccd6;
+    --silver-deep: #8992a3;
+    --silver-shine: #eef1f5;
+    --silver-line: #a9b0bd;
+    /* acentos dorado/beige — pedidos para darle más presencia a esa
+       combinación en toda la invitación, sin tocar el sistema azul/
+       plata ya afinado (se usan como detalle puntual, no como base) */
+    --gold: #c9a659;
+    --gold-deep: #a3803a;
+    --beige: #f3ead9;
+    --beige-deep: #e6d5ae;
+    --text-dark: #23324a;
+    --text-mid: #5b6b85;
+    --text-light: #93a0b8;
+    --glow: rgba(63, 111, 168, .28);
+    --glow-silver: rgba(180, 190, 205, .35);
+    --glow-gold: rgba(201, 166, 89, .32);
+}
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+    /* dos luces radiales suaves (reusan --glow/--glow-silver, ya
+       semitransparentes así se funden limpio a "transparent") sobre el
+       degradado de siempre, para dar algo de profundidad ambiental al
+       marco que rodea la tarjeta en viewports anchos */
+    background:
+        radial-gradient(circle at 15% 10%, var(--glow), transparent 55%),
+        radial-gradient(circle at 85% 90%, var(--glow-gold), transparent 55%),
+        linear-gradient(160deg, var(--powder), var(--beige) 55%, var(--silver-deep));
+    color: var(--text-dark);
+    font-family: 'Quicksand', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    /* centra la tarjeta (#snap-container) cuando su max-height la topa
+       y queda más chica que el viewport — mismo criterio que el
+       margin:0 auto que ya la centra horizontalmente cuando topa el
+       ancho */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+img {
+    -webkit-user-drag: none;
+    user-select: none;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SCROLL-SNAP · una pantalla completa a la vez
+   ══════════════════════════════════════════════════════════════ */
+#snap-container {
+    /* vh primero como respaldo: en navegadores sin soporte de svh
+       (previos a ~2022) esta segunda declaración se ignora y se queda
+       con la primera, en vez de dejar height:auto (que colapsaría todo
+       el layout de scroll-snap, ya que .screen mide su alto con 100%
+       contra este contenedor) */
+    height: 100vh;
+    height: 100svh;
+    max-width: 560px;
+    /* mismo criterio que max-width: tope de "tablet estándar" en alto,
+       para que en desktop (viewport muy alto) la tarjeta no se estire
+       sin límite — solo entra en juego cuando 100svh supera 1024px */
+    max-height: 1024px;
+    margin: 0 auto;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: 0 0 70px rgba(31, 63, 102, .18);
+}
+
+.screen {
+    /* % (no svh): así cada pantalla se mide contra el alto real de
+       #snap-container (que se topa en max-height cuando el viewport es
+       muy alto), nunca contra el viewport directo — mismo motivo por
+       el que ya usa width:100% y no 100vw */
+    height: 100%;
+    width: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    text-align: center;
+    padding: clamp(1.2rem, 6vh, 2.5rem) clamp(1.2rem, 6vw, 2.5rem);
+    /* degradado con blue-light en AMBOS extremos (antes solo abajo) y
+       el tono claro propio de cada pantalla en medio, donde vive el
+       texto — se asoma en el espacio transparente de los marcos
+       florales de arriba/abajo, y ese mismo azul en los 2 bordes de
+       las 7 pantallas es lo que une visualmente toda la invitación */
+    background: linear-gradient(180deg, var(--blue-light) 0%, var(--cream) 18%, var(--beige) 55%, var(--blue-light) 100%);
+}
+
+.screen-galeria {
+    background: linear-gradient(180deg, var(--blue-light) 0%, var(--beige) 18%, var(--powder) 55%, var(--blue-light) 100%);
+}
+
+/* .p1-mascot ya no vive en el flujo (ver regla más abajo) — se reserva
+   espacio abajo para que .p1-content, centrado con flex, no baje tanto
+   que choque con el oso anclado al fondo. Una sola fórmula atada al
+   mismo 50% del ancho de .p1-mascot (ver esa regla) y a la relación de
+   aspecto real de oso.png (752×998px → 998/752 = 1.327), en vez de un
+   valor aparte por breakpoint: min(100vw,560px) es el ancho real de la
+   tarjeta en cualquier dispositivo (nunca crece pasado los 560px que
+   topa #snap-container), así el espacio reservado siempre alcanza. */
+.screen-portada {
+    padding-bottom: calc(min(100vw, 560px) * 0.5 * 1.327 + 2rem);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PISTA DE DESLIZAR (solo pantalla 1, se oculta al primer scroll)
+   ══════════════════════════════════════════════════════════════ */
+/* absolute (no fixed) y ahora vive DENTRO de .screen-portada: con
+   fixed se posicionaba contra el VIEWPORT real, no contra la tarjeta
+   ya capada/centrada (#snap-container tope 560x1024) — en cualquier
+   pantalla donde la tarjeta no llena el viewport (tablet/desktop)
+   terminaba mostrándose fuera de la tarjeta, invisible. Moverlo al
+   flujo de .screen-portada (position:relative) resuelve lo mismo que
+   ya se hizo con .p1-mascot/.p5-footer */
+.scroll-hint {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(1.2rem, 4vh, 2rem);
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .15rem;
+    /* misma pastilla de fondo que .p5-footer: esta zona se solapa con
+       el oso (p1-mascot) y con el borde del degradado, así que sin un
+       fondo propio se pierde detrás de lo que haya ahí */
+    padding: .35rem .8rem .4rem;
+    border-radius: 20px;
+    background: rgba(248, 250, 252, .85);
+    box-shadow: 0 4px 14px rgba(63, 111, 168, .12);
+    color: var(--blue-deep);
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    font-size: .8rem;
+    letter-spacing: .12em;
+    pointer-events: none;
+    opacity: .85;
+    transition: opacity .6s ease;
+}
+
+.scroll-hint.is-hidden {
+    opacity: 0;
+}
+
+/* la mano hace el gesto de "swipe" (sube + fade in/out) — el texto
+   "Desliza" se queda quieto, solo esto anima. El salto de vuelta a la
+   posición inicial ocurre justo cuando opacity ya es 0 en ambos
+   extremos (100%→0% del siguiente loop), así no se nota.
+   width:44px (no 22px): el arte de hand.svg es de trazo delgado con
+   mucho espacio vacío alrededor dentro de su viewBox — comprobado con
+   captura de pantalla que a 22px el trazo se antialiasea a casi nada
+   contra la pastilla clara y queda invisible; a 44px se ve con claridad */
+.scroll-hint-hand {
+    width: 44px;
+    height: auto;
+    animation: handSwipe 1.6s ease-in-out infinite;
+}
+
+@keyframes handSwipe {
+    0% {
+        transform: translateY(6px);
+        opacity: 0;
+    }
+
+    25% {
+        opacity: 1;
+    }
+
+    65% {
+        transform: translateY(-14px);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-14px);
+        opacity: 0;
+    }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DECORACIONES COMPARTIDAS · marcos florales (marco_a arriba, marco_b abajo), moño
+   ══════════════════════════════════════════════════════════════ */
+/* max-height atado al ANCHO real de la tarjeta (min(100vw,560px)), no a
+   vh: la imagen se escala por width:100% así que su alto real depende
+   del ancho, no del alto de viewport. Un tope en vh se quedaba corto
+   (y recortaba el marco) en cualquier ventana ancha-pero-baja —
+   desktop típico, ej. 1440×900 — porque 34vh de 900px es menos que el
+   alto natural de la imagen a 560px de ancho. 0.62 da margen de sobra
+   sobre la relación real (1536/2752≈0.558). */
+.deco-marco {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    max-height: calc(min(100vw, 560px) * 0.62);
+    overflow: hidden;
+    z-index: 1;
+    pointer-events: none;
+    line-height: 0;
+}
+
+.deco-marco img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.marco-top {
+    top: 0;
+}
+
+.marco-bottom {
+    bottom: 0;
+    /* flex (no position:absolute en el img) para que la imagen siga "en
+       flujo" y el contenedor pueda auto-medirse por contenido hasta el
+       tope de max-height; flex-end ancla el borde inferior de la imagen
+       (zona con flores) al borde inferior de la pantalla, así que si hay
+       que recortar por exceder max-height, se recorta desde arriba
+       (zona transparente), no desde las flores */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+/* Tablet: marco_a/marco_b heredan la regla base (width:100%; left:0;
+   max-height atado al ancho — ver .deco-marco) en vez de un
+   ancho/alto propio: un intento anterior de encogerlos aquí
+   (width:84%/left:8% + max-height más chico) terminó viéndose
+   recortado y sin abarcar el ancho completo en iPad Air/Mini. La
+   regla base ya da margen de sobra para la relación de aspecto real
+   de la imagen, así que no hace falta un valor propio aquí. Solo se
+   mantiene el pequeño "sangrado" fuera de pantalla que sí se pidió
+   explícitamente antes. */
+@media (min-width: 601px) and (max-width: 900px) {
+    .marco-top {
+        top: -5vh;
+    }
+
+    .marco-bottom {
+        bottom: -5vh;
+    }
+
+    /* dos clases (mayor especificidad que .deco-bow solo) para que gane
+       sin importar el orden en el archivo; solo portada, no toca el
+       moño chico de dedicatoria/despedida. El margin-top empuja hacia
+       abajo TODO el bloque en flujo (moño + p1-content), porque
+       .screen centra ese bloque como conjunto: al crecer el margen del
+       primer hijo, el conjunto completo se recorre hacia abajo, pero
+       solo la MITAD de lo que se le agrega a margin-top (el bloque
+       crece esa cantidad y, al recentrarse, la otra mitad se la come
+       hacia arriba) — por eso el tope del clamp es bastante más alto
+       de lo que parecería necesario a simple vista. */
+    .screen-portada .bow-top {
+        width: 30%;
+        margin-top: clamp(2.5rem, 10vh, 6.5rem);
+    }
+}
+
+.deco-bow {
+    /* % (no vw): mismo motivo que .p1-mascot — así el moño se ve
+       "relativamente igual" (mismo % del contenedor) en todos los tamaños */
+    width: 60%;
+    height: auto;
+    z-index: 2;
+    margin-bottom: 2rem;
+}
+
+
+.bow-bottom {
+    /* este sí sigue absoluto: en la pantalla de despedida va después del
+       título, pegado al borde inferior, no compite con texto arriba */
+    position: absolute;
+    bottom: clamp(58px, 15vh, 128px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.bow-small {
+    width: 16%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scroll-hint-hand {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PANTALLA 1 · PORTADA
+   ══════════════════════════════════════════════════════════════ */
+.p1-content {
+    position: relative;
+    z-index: 3;
+    max-width: 420px;
+}
+
+.p1-eyebrow {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    letter-spacing: .1em;
+    font-size: clamp(.72rem, 2.6vw, .88rem);
+    color: var(--text-mid);
+    /* vh (no vw/px fijo): reparte el texto en el espacio vertical
+       disponible de forma consistente en cualquier tamaño de pantalla,
+       en vez de quedar apretado arriba con un hueco grande antes del oso */
+    margin-bottom: clamp(1rem, 4vh, 1.9rem);
+}
+
+.p1-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: clamp(2.6rem, 12vw, 3.8rem);
+    color: var(--blue-deep);
+    line-height: 1;
+    margin-bottom: clamp(.7rem, 2.6vh, 1.3rem);
+}
+
+.p1-subtitle {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    letter-spacing: .08em;
+    font-size: clamp(1.1rem, 4.6vw, 1.5rem);
+    /* azul (no gold-deep): así no queda del mismo color que .p1-name
+       justo debajo, que es el que debe destacar como el dorado "hero" */
+    color: var(--blue);
+    margin-bottom: clamp(.5rem, 2vh, 1rem);
+}
+
+.p1-name {
+    font-family: 'Alex Brush', cursive;
+    font-weight: 400;
+    font-size: clamp(2.6rem, 11vw, 4rem);
+    color: var(--gold-deep);
+    filter: drop-shadow(0 4px 18px rgba(248, 250, 252, .9));
+}
+
+.word {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.char {
+    display: inline-block;
+}
+
+.p1-mascot {
+    /* absoluto y anclado al fondo de .screen-portada (que es position:relative)
+       en vez de vivir en el flujo flex — así queda siempre a la misma altura
+       relativa a la pantalla sin importar cuánto texto haya arriba, igual en
+       todos los dispositivos. z-index por debajo de .deco-marco (1) para que
+       marco_b, también anclado abajo, se vea encima del oso donde se solapen.
+
+       width en % (no vw ni clamp con vw): al ser position:absolute, el %
+       resuelve siempre contra el ancho real de .screen-portada/#snap-container
+       (que se topa en 560px), nunca contra el viewport — por eso una sola
+       regla, sin breakpoints de ancho, ya da un tamaño "relativamente igual"
+       en cualquier dispositivo: crece 1:1 con el celular hasta topar en 560px
+       (187px→240px→280px) y de ahí queda plano en 280px para todo tablet y
+       desktop. Antes había 4 reglas de width sueltas (base/max-height:700px/
+       max-width:480px/tablet) cada una en vw o valores fijos distintos, lo
+       que producía saltos bruscos de tamaño justo en los bordes de cada
+       breakpoint — no vuelvas a agregar una regla de ancho por breakpoint,
+       ajusta este único 50% si hace falta más grande/chico. */
+    position: absolute;
+    left: 50%;
+    bottom: clamp(.6rem, 2.5vh, 1.4rem);
+    transform: translateX(-50%);
+    z-index: 0;
+    width: 50%;
+    filter: drop-shadow(0 10px 20px var(--glow));
+}
+
+/* Mobile (≤600px, mismo corte que ya usa .deco-marco para tablet): la
+   fórmula base de arriba está pensada para escalar hasta desktop, así
+   que en celular se queda chica. Aquí se agranda bastante y se reparte
+   con más margen vertical para llenar el espacio libre entre marco_a
+   (arriba) y el oso/marco_b (abajo), en vez de quedar comprimida al
+   centro. Va ANTES de @media(max-height:700px) más abajo a propósito:
+   en celulares bajos esa regla (que aparece después en el archivo)
+   debe seguir ganando la cascada y encoger título/nombre — si este
+   bloque se pusiera después la pisaría y el texto no bajaría de tamaño
+   en pantallas cortas. Ronda de tablet queda pendiente, aparte. */
+@media (max-width: 600px) {
+    .p1-eyebrow {
+        font-size: clamp(.95rem, 4.4vw, 1.15rem);
+        margin-bottom: 0;
+    }
+
+    .p1-title {
+        font-size: clamp(3.4rem, 16vw, 4.2rem);
+        margin-bottom: 0;
+    }
+
+    .p1-subtitle {
+        font-size: clamp(1.5rem, 7vw, 1.85rem);
+        margin-bottom: 0;
+    }
+
+    .p1-name {
+        font-size: clamp(3.2rem, 15vw, 4.6rem);
+        margin-top: clamp(.6rem, 2.5vh, 1.2rem);
+    }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PANTALLA 2 · DEDICATORIA
+   ══════════════════════════════════════════════════════════════ */
+.p2-content {
+    position: relative;
+    z-index: 3;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.1rem, 4.5vh, 1.8rem);
+}
+
+.ded-line {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 500;
+    letter-spacing: .04em;
+    /* calc(min(100vw,560px) * factor), no vw suelto: la parte fluida
+       deja de crecer justo cuando #snap-container topa en 560px (igual
+       que .p1-mascot con su width:50%), así que el clamp satura ~420px
+       de ancho y de ahí en adelante — mobile grande Y toda la franja
+       de tablet — el texto queda exactamente en el mismo tamaño, sin
+       necesitar un breakpoint de tablet aparte */
+    font-size: clamp(.85rem, calc(min(100vw, 560px) * 0.041), 1.05rem);
+    line-height: 1.5;
+    color: var(--text-dark);
+}
+
+.ded-line .accent {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-style: italic;
+    color: var(--blue);
+    letter-spacing: .01em;
+}
+
+/* nombres de padres/padrinos: son el dato importante, así que van MÁS
+   grandes y con más peso que la frase del poema (en em, relativa al
+   font-size ya fluido de .ded-line, así no necesita breakpoints
+   propios — sigue escalando aunque .ded-line se achique) */
+.ded-line .ded-names {
+    display: block;
+    margin-top: .4em;
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.3em;
+    letter-spacing: .01em;
+    /* dorado (antes blue-deep): el .accent de arriba se queda azul, así
+       el poema mantiene el ritmo azul→dorado en vez de un bloque del
+       mismo color */
+    color: var(--gold-deep);
+}
+
+.p2-mascot {
+    position: relative;
+    z-index: 2;
+    width: clamp(90px, 24vw, 130px);
+    margin-top: clamp(1rem, 3.5vh, 1.6rem);
+    filter: drop-shadow(0 10px 18px var(--glow));
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PANTALLA 3 · EVENTO
+   ══════════════════════════════════════════════════════════════ */
+.p3-content {
+    position: relative;
+    z-index: 3;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(.7rem, 2.8vh, 1.1rem);
+}
+
+/* solo queda la paloma (se quitó chalice.svg) — ya no hace falta la
+   caja alta con 2 iconos apilados en position:absolute, ahora es un
+   solo ícono centrado con su propia proporción (dove.svg es ~1:1) */
+.icon-dove-chalice {
+    width: clamp(66px, 20vw, 92px);
+    margin-bottom: .4rem;
+}
+
+.icon-dove {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.ev3-intro {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    letter-spacing: .08em;
+    /* calc(min(100vw,560px) * factor), no vw suelto: mismo motivo que
+       .ded-line — el clamp satura ~430px de ancho, así mobile grande y
+       toda la franja de tablet quedan en el mismo tamaño */
+    font-size: clamp(.92rem, calc(min(100vw, 560px) * 0.039), 1.05rem);
+    color: var(--text-mid);
+}
+
+.ev3-month {
+    font-family: 'Alex Brush', cursive;
+    font-size: clamp(2.3rem, calc(min(100vw, 560px) * 0.119), 3.2rem);
+    color: var(--gold-deep);
+    line-height: 1;
+    margin: -.2rem 0;
+}
+
+.ev3-daterow {
+    display: flex;
+    align-items: center;
+    gap: clamp(.6rem, 3vw, 1.1rem);
+    margin: .3rem 0;
+}
+
+.ev3-day-name,
+.ev3-year {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    letter-spacing: .06em;
+    font-size: clamp(.95rem, calc(min(100vw, 560px) * 0.041), 1.1rem);
+    color: var(--text-mid);
+    border-top: 1px solid var(--silver-line);
+    border-bottom: 1px solid var(--silver-line);
+    padding: .3rem 0;
+}
+
+.ev3-day-num {
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2.6rem, calc(min(100vw, 560px) * 0.134), 3.6rem);
+    color: var(--blue-deep);
+    line-height: 1;
+}
+
+/* RECEPCIÓN y MISA en una sola fila (antes eran 2 bloques apilados
+   con el nombre del lugar repetido en cada uno) — ahora ese nombre
+   solo vive una vez, en la tarjeta .ev3-location de abajo, así que
+   aquí solo queda label+hora por lado y se ahorra el alto que antes
+   ocupaban los 2 bloques apilados */
+.ev3-schedule {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(1rem, 5vw, 1.6rem);
+}
+
+.ev3-schedule-sep {
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 1.3rem;
+    line-height: 1;
+    color: var(--gold);
+}
+
+.ev3-label {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    letter-spacing: .12em;
+    font-size: clamp(1rem, calc(min(100vw, 560px) * 0.043), 1.15rem);
+    color: var(--blue);
+    margin-bottom: .15rem;
+}
+
+.ev3-time {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 400;
+    font-size: clamp(.92rem, calc(min(100vw, 560px) * 0.038), 1.02rem);
+    color: var(--text-light);
+}
+
+/* tarjeta de ubicación: toda la tarjeta es el link a Google Maps.
+   Mismo lenguaje visual que .gal-cell (radio grande, sombra suave) y
+   que .btn-calendar (botón píldora), para que combine con el resto */
+.ev3-location {
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--beige);
+    box-shadow: 0 10px 24px rgba(63, 111, 168, .2);
+    text-decoration: none;
+}
+
+.ev3-location-img {
+    width: 100%;
+    aspect-ratio: 5 / 2;
+    object-fit: cover;
+    display: block;
+}
+
+.ev3-location-body {
+    padding: .65rem .9rem .8rem;
+    text-align: center;
+}
+
+.ev3-location-name {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: clamp(.98rem, calc(min(100vw, 560px) * 0.041), 1.1rem);
+    color: var(--blue-deep);
+    margin-bottom: .15rem;
+}
+
+.ev3-location-addr {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 500;
+    font-size: clamp(.75rem, calc(min(100vw, 560px) * 0.031), .85rem);
+    line-height: 1.35;
+    color: var(--text-mid);
+    margin-bottom: .55rem;
+}
+
+.ev3-location-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .45rem 1.1rem;
+    border: 1px solid rgba(201, 166, 89, .55);
+    border-radius: 30px;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: clamp(.72rem, calc(min(100vw, 560px) * 0.029), .82rem);
+    letter-spacing: .04em;
+    color: var(--gold-deep);
+    transition: all .3s;
+}
+
+.ev3-location:hover .ev3-location-btn,
+.ev3-location:active .ev3-location-btn {
+    background: var(--beige);
+    border-color: var(--gold);
+}
+
+/* Mobile (≤480px, mismo corte que ya usa .icon-dove-chalice): tablet
+   quedó aprobado ("se ve muy bien") con los techos de arriba, que se
+   alcanzan ya desde ~430px de ancho — pero eso deja a los celulares
+   más angostos (320-428px, la mayoría) viendo un tamaño intermedio,
+   nunca el techo grande que sí ve tablet. Aquí se sube un techo propio
+   solo para mobile, con el techo VIEJO (el que ya aprobó tablet) como
+   piso — así nunca se ve más chico que antes, solo más grande. Va
+   ANTES de @media(max-height:700px) más abajo a propósito, mismo
+   motivo que en portada: en celulares bajos esa regla debe seguir
+   ganando y encoger .ev3-month/.ev3-day-num. */
+@media (max-width: 480px) {
+    .ev3-intro {
+        font-size: clamp(1.05rem, 4.9vw, 1.2rem);
+    }
+
+    .ev3-month {
+        font-size: clamp(3.2rem, 15.2vw, 3.7rem);
+    }
+
+    .ev3-day-name,
+    .ev3-year {
+        font-size: clamp(1.1rem, 5.1vw, 1.25rem);
+    }
+
+    .ev3-day-num {
+        font-size: clamp(3.6rem, 16.8vw, 4.1rem);
+    }
+
+    .ev3-label {
+        font-size: clamp(1.15rem, 5.3vw, 1.3rem);
+    }
+
+    .ev3-time {
+        font-size: clamp(1.02rem, 4.7vw, 1.15rem);
+    }
+
+    .ev3-location-name {
+        font-size: clamp(1.1rem, 5.1vw, 1.25rem);
+    }
+
+    .ev3-location-addr {
+        font-size: clamp(.85rem, 4vw, .96rem);
+    }
+
+    .ev3-location-btn {
+        font-size: clamp(.82rem, 3.8vw, .92rem);
+    }
+}
+
+/* Líneas geométricas doradas — se habían cambiado a plata al inicio del
+   proyecto para simplificar la paleta a azul/plata; ahora que piden más
+   presencia de dorado, vuelven a su color original */
+.silver-line {
+    position: absolute;
+    z-index: 1;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    pointer-events: none;
+}
+
+.line-a {
+    top: 14%;
+    left: -6%;
+    width: 46%;
+    height: 1px;
+    transform: rotate(-18deg);
+}
+
+.line-b {
+    bottom: 12%;
+    right: -6%;
+    width: 46%;
+    height: 1px;
+    transform: rotate(-18deg);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PANTALLA 3.5 · CUENTA REGRESIVA (basada en bautizo/)
+   ══════════════════════════════════════════════════════════════ */
+.screen-cuenta {
+    background: linear-gradient(180deg, var(--blue-light) 0%, var(--beige) 18%, var(--powder) 55%, var(--blue-light) 100%);
+}
+
+.pcd-content {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 400px;
+    gap: clamp(1rem, 4vh, 1.7rem);
+}
+
+.cd-mascot {
+    width: clamp(100px, calc(min(100vw, 560px) * 0.26), 145px);
+    margin-bottom: clamp(.3rem, 1.5vh, .7rem);
+    filter: drop-shadow(0 10px 18px var(--glow));
+}
+
+.cd-eyebrow {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    letter-spacing: .08em;
+    /* calc(min(100vw,560px) * factor): mismo patrón que .ev3-intro, para
+       que mobile grande y tablet salgan consistentes desde el arranque */
+    font-size: clamp(.92rem, calc(min(100vw, 560px) * 0.039), 1.05rem);
+    color: var(--text-mid);
+}
+
+.cd-heading {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: clamp(1.3rem, calc(min(100vw, 560px) * 0.063), 1.7rem);
+    color: var(--blue-deep);
+    line-height: 1.25;
+    text-align: center;
+}
+
+.countdown-wrap {
+    background: rgba(243, 234, 217, .55);
+    border: 1px solid rgba(201, 166, 89, .3);
+    border-radius: 20px;
+    padding: clamp(1.2rem, 4vh, 1.8rem) clamp(1rem, 4vw, 1.6rem);
+    max-width: 460px;
+    width: 100%;
+}
+
+.countdown-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(.5rem, 2.5vw, 1.3rem);
+    flex-wrap: nowrap;
+}
+
+.cd-unit {
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.cd-num {
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.9rem, calc(min(100vw, 560px) * 0.097), 2.6rem);
+    color: var(--blue-deep);
+    line-height: 1;
+    display: block;
+}
+
+.cd-label {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    font-size: clamp(.62rem, calc(min(100vw, 560px) * 0.027), .72rem);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-top: .35rem;
+    white-space: nowrap;
+}
+
+.cd-sep {
+    font-family: 'Baloo 2', sans-serif;
+    font-size: clamp(1.3rem, calc(min(100vw, 560px) * 0.063), 1.7rem);
+    color: var(--gold-deep);
+    flex-shrink: 0;
+    line-height: 1;
+    padding-bottom: .4rem;
+}
+
+.btn-calendar {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: clamp(.7rem, 3vh, .95rem) clamp(1.6rem, 6vw, 2.4rem);
+    border: 1px solid rgba(201, 166, 89, .55);
+    border-radius: 30px;
+    background: transparent;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: clamp(.8rem, calc(min(100vw, 560px) * 0.034), .92rem);
+    letter-spacing: .06em;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all .3s;
+}
+
+.btn-calendar:hover {
+    background: var(--beige);
+    border-color: var(--gold);
+    color: var(--gold-deep);
+}
+
+/* ── Modal: guardar en calendario (basado en bautizo/, mismas variables
+   de color así que el recoloreo es mínimo; el box está topado a 360px
+   así que no necesita el patrón min(100vw,560px), nunca crece con el
+   viewport) ── */
+.cal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(35, 50, 74, .45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+    padding: 1rem;
+}
+
+.cal-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.cal-modal-box {
+    background: rgba(248, 250, 252, .98);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(63, 111, 168, .3);
+    border-radius: 26px;
+    padding: 2.2rem 2rem 2rem;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 24px 70px rgba(35, 50, 74, .22);
+    position: relative;
+    transform: translateY(22px) scale(.96);
+    transition: transform .38s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.cal-overlay.visible .cal-modal-box {
+    transform: translateY(0) scale(1);
+}
+
+.cal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.2rem;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-light);
+    cursor: pointer;
+    line-height: 1;
+    transition: color .2s, transform .2s;
+    padding: .2rem;
+}
+
+.cal-close:hover {
+    color: var(--blue-deep);
+    transform: rotate(90deg);
+}
+
+.cal-modal-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 1.6rem;
+    color: var(--blue-deep);
+    margin-bottom: .4rem;
+    line-height: 1.2;
+}
+
+.cal-modal-sub {
+    font-size: .83rem;
+    color: var(--text-mid);
+    line-height: 1.65;
+    margin-bottom: 1.4rem;
+}
+
+.cal-device-instructions {
+    display: flex;
+    flex-direction: column;
+    gap: .65rem;
+    margin-bottom: 1.6rem;
+}
+
+.cal-device-row {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    background: rgba(255, 255, 255, .7);
+    border: 1px solid rgba(63, 111, 168, .15);
+    border-radius: 14px;
+    padding: .85rem 1rem;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.cal-device-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.cal-device-icon.android {
+    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+}
+
+.cal-device-icon.iphone {
+    background: linear-gradient(135deg, #eef2f7, var(--silver));
+}
+
+.cal-device-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.cal-device-label {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: .62rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    display: block;
+    margin-bottom: .2rem;
+}
+
+.cal-device-desc {
+    font-size: .8rem;
+    color: var(--text-mid);
+    line-height: 1.5;
+}
+
+.cal-confirm-btn {
+    width: 100%;
+    padding: .95rem;
+    background: linear-gradient(135deg, var(--blue), var(--blue-deep));
+    border: none;
+    border-radius: 30px;
+    color: white;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 6px 22px rgba(63, 111, 168, .3);
+    transition: transform .22s, box-shadow .22s;
+    margin-top: .2rem;
+}
+
+.cal-confirm-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(63, 111, 168, .4);
+}
+
+/* ── Modal: contacto (basado en bautizo/, mismas variables de color) ── */
+.contact-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: rgba(35, 50, 74, .45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+}
+
+.contact-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.contact-modal-box {
+    background: rgba(248, 250, 252, .98);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(63, 111, 168, .3);
+    border-radius: 26px;
+    padding: 2.5rem 2rem 2rem;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 0 24px 70px rgba(35, 50, 74, .22);
+    position: relative;
+    text-align: center;
+    transform: translateY(22px) scale(.96);
+    transition: transform .38s cubic-bezier(.34, 1.56, .64, 1);
+}
+
+.contact-overlay.visible .contact-modal-box {
+    transform: translateY(0) scale(1);
+}
+
+.contact-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.2rem;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-light);
+    cursor: pointer;
+    line-height: 1;
+    transition: color .2s, transform .2s;
+    padding: .2rem;
+}
+
+.contact-close:hover {
+    color: var(--blue-deep);
+    transform: rotate(90deg);
+}
+
+.contact-modal-icon {
+    font-size: 2.2rem;
+    display: block;
+    margin-bottom: .8rem;
+}
+
+.contact-modal-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 1.55rem;
+    color: var(--blue-deep);
+    line-height: 1.3;
+    margin-bottom: .6rem;
+}
+
+.contact-modal-sub {
+    font-size: .88rem;
+    color: var(--text-mid);
+    line-height: 1.65;
+    margin-bottom: 1.8rem;
+}
+
+.btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: .55rem;
+    padding: .9rem 1.8rem;
+    background: #25d366;
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    font-family: 'Quicksand', sans-serif;
+    font-size: .88rem;
+    font-weight: 700;
+    letter-spacing: .03em;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 6px 20px rgba(37, 211, 102, .35);
+    transition: transform .22s, box-shadow .22s;
+}
+
+.btn-whatsapp:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(37, 211, 102, .45);
+}
+
+.btn-whatsapp svg {
+    width: 20px;
+    height: 20px;
+    fill: #fff;
+    flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PANTALLA 4 · GALERÍA
+   ══════════════════════════════════════════════════════════════ */
+/* envuelve heading + galería + botón para poder subirlos por encima de
+   .deco-marco (z-index:1) con un solo z-index propio, mismo criterio
+   que .p1-content/.prsvp-content en las demás pantallas */
+.p4-content {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.p4-heading {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    letter-spacing: .14em;
+    font-size: clamp(1rem, 4vw, 1.3rem);
+    color: var(--gold-deep);
+    margin-bottom: clamp(1rem, 4vh, 1.6rem);
+}
+
+/* pila apilada en el centro (no grilla): todas las fotos ocupan el
+   mismo espacio, cada una con su propia rotación fija (ver .gal-cell
+   :nth-child abajo) — el 78vw/300px es seguro sin el patrón
+   min(100vw,560px) porque ya topa en el px fijo bastante antes de que
+   el contenedor principal llegue a sus 560px (mismo motivo por el que
+   .p2-mascot tampoco lo necesitaba) */
+.gallery-grid {
+    position: relative;
+    width: min(78vw, 300px);
+    aspect-ratio: 3 / 4;
+    /* piso de seguridad: todas las .gal-cell son position:absolute, así
+       que no aportan alto propio — sin soporte de aspect-ratio (previo
+       a ~2021) el contenedor colapsaría a 0 y la galería desaparecería.
+       min-height no interfiere en navegadores modernos porque el alto
+       real (hasta 400px) siempre queda por encima de este piso */
+    min-height: 320px;
+    margin: 0 auto;
+}
+
+.gal-cell {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--powder), var(--beige));
+    box-shadow: 0 10px 24px rgba(63, 111, 168, .22);
+}
+
+/* rotación alternada + pequeño desplazamiento por foto, para que se
+   vean como un montón de fotos tipo Polaroid tiradas una sobre otra;
+   z-index creciente para que la última en aparecer quede arriba del
+   todo, coincidiendo con el orden del stagger de la animación */
+.gal-cell:nth-child(1) {
+    transform: rotate(-9deg) translate(-6px, -4px);
+    z-index: 1;
+}
+
+.gal-cell:nth-child(2) {
+    transform: rotate(7deg) translate(8px, 3px);
+    z-index: 2;
+}
+
+.gal-cell:nth-child(3) {
+    transform: rotate(-6deg) translate(4px, 6px);
+    z-index: 3;
+}
+
+.gal-cell:nth-child(4) {
+    transform: rotate(10deg) translate(-8px, -3px);
+    z-index: 4;
+}
+
+.gal-cell:nth-child(5) {
+    transform: rotate(-8deg) translate(3px, 7px);
+    z-index: 5;
+}
+
+.gal-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.gal-cell-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1.6rem, 7vw, 2.2rem);
+}
+
+/* oculto hasta que playScreen4 termina de mostrar la última foto
+   (marca .is-visible en el onComplete de su timeline) */
+.btn-replay {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    margin-top: clamp(1.3rem, 5vh, 2.1rem);
+    padding: clamp(.65rem, 2.8vh, .85rem) clamp(1.4rem, 5.5vw, 2rem);
+    border: 1px solid rgba(201, 166, 89, .55);
+    border-radius: 30px;
+    background: transparent;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: clamp(.78rem, calc(min(100vw, 560px) * 0.032), .9rem);
+    letter-spacing: .05em;
+    color: var(--text-mid);
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: all .3s;
+}
+
+.btn-replay.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.btn-replay:hover {
+    background: var(--beige);
+    border-color: var(--gold);
+    color: var(--gold-deep);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PANTALLA 4.5 · CONFIRMACIÓN (RSVP, basada en bautizo/)
+   ══════════════════════════════════════════════════════════════ */
+.screen-rsvp {
+    background: linear-gradient(180deg, var(--blue-light) 0%, var(--cream) 18%, var(--beige) 55%, var(--blue-light) 100%);
+}
+
+.prsvp-content {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(.7rem, 3vh, 1.1rem);
+}
+
+.rsvp-eyebrow {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    letter-spacing: .08em;
+    /* mismo patrón que .cd-eyebrow: satura ~430px, mobile grande y
+       tablet quedan consistentes desde el arranque */
+    font-size: clamp(.92rem, calc(min(100vw, 560px) * 0.039), 1.05rem);
+    color: var(--text-mid);
+}
+
+.rsvp-heading {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: clamp(1.3rem, calc(min(100vw, 560px) * 0.063), 1.7rem);
+    color: var(--blue-deep);
+    line-height: 1.25;
+}
+
+/* el widget de abajo (tarjetas, formulario, resumen) es un componente
+   de formulario, no tipografía de portada — se copian los tamaños de
+   bautizo/ casi tal cual (ya probados y legibles) en vez de la fórmula
+   fluida, solo se ajustan paddings/gaps para cada paso quepa en una
+   sola pantalla en vez de una sección larga con scroll libre */
+.rsvp-stepper {
+    width: 100%;
+    /* svh (no vh) + un poco más de margen que antes, para que el
+       cálculo no se quede corto en Safari móvil cuando la barra de
+       herramientas está visible. Sigue siendo una red de seguridad —
+       la barra de scroll queda oculta abajo así que, aunque llegara a
+       activarse, no se ve */
+    max-height: 60vh;
+    max-height: 60svh;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.rsvp-stepper::-webkit-scrollbar {
+    display: none;
+}
+
+.rsvp-step-hint {
+    font-size: .75rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+}
+
+.attend-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .8rem;
+    margin-bottom: .8rem;
+}
+
+.attend-option {
+    background: rgba(255, 255, 255, .65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 2px solid rgba(63, 111, 168, .2);
+    border-radius: 16px;
+    padding: 1.3rem .8rem;
+    cursor: pointer;
+    transition: all .3s;
+}
+
+.attend-option:hover {
+    border-color: var(--gold);
+    background: rgba(255, 255, 255, .9);
+    transform: translateY(-2px);
+}
+
+.attend-option.selected {
+    border-color: var(--gold);
+    background: var(--beige);
+}
+
+.ao-label {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: var(--blue-deep);
+    display: block;
+    margin-bottom: .2rem;
+}
+
+.ao-sub {
+    font-size: .66rem;
+    color: var(--text-light);
+    letter-spacing: .04em;
+}
+
+.stepper-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: .8rem;
+}
+
+.step-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(63, 111, 168, .25);
+    transition: all .3s;
+}
+
+.step-dot.active {
+    width: 22px;
+    border-radius: 4px;
+    background: var(--gold);
+}
+
+.step-dot.done {
+    background: var(--gold);
+    opacity: .5;
+}
+
+.rsvp-step {
+    display: none;
+    animation: stepIn .4s ease;
+}
+
+.rsvp-step.active {
+    display: block;
+}
+
+@keyframes stepIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.rsvp-form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: .8rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    text-align: left;
+}
+
+.form-label {
+    font-size: .63rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-light);
+}
+
+.form-input {
+    background: rgba(255, 255, 255, .75);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(63, 111, 168, .25);
+    border-radius: 12px;
+    padding: .75rem 1rem;
+    font-family: 'Quicksand', sans-serif;
+    font-size: .92rem;
+    color: var(--text-dark);
+    outline: none;
+    transition: border-color .3s, box-shadow .3s, opacity .3s;
+    width: 100%;
+}
+
+.form-input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(63, 111, 168, .15);
+}
+
+.form-input:disabled {
+    opacity: .38;
+    cursor: not-allowed;
+}
+
+.anon-label {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-top: .25rem;
+    cursor: pointer;
+    width: fit-content;
+}
+
+.anon-label input[type="checkbox"] {
+    accent-color: var(--blue);
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.anon-label span {
+    font-size: .76rem;
+    color: var(--text-light);
+    letter-spacing: .03em;
+    transition: color .2s;
+}
+
+.anon-label:hover span {
+    color: var(--text-mid);
+}
+
+.guest-counter {
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    background: rgba(255, 255, 255, .7);
+    border: 1px solid rgba(63, 111, 168, .25);
+    border-radius: 12px;
+    padding: .5rem 1rem;
+}
+
+.counter-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(63, 111, 168, .4);
+    background: transparent;
+    color: var(--blue);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s;
+    line-height: 1;
+}
+
+.counter-btn:hover {
+    background: var(--powder);
+}
+
+.counter-num {
+    font-family: 'Baloo 2', sans-serif;
+    font-size: 1.3rem;
+    color: var(--blue-deep);
+    min-width: 22px;
+    text-align: center;
+    flex: 1;
+}
+
+.counter-label {
+    font-size: .68rem;
+    color: var(--text-light);
+}
+
+.confirm-summary {
+    background: rgba(255, 255, 255, .75);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(63, 111, 168, .25);
+    border-radius: 16px;
+    padding: 1.3rem 1.2rem;
+    margin-bottom: 1.1rem;
+    text-align: left;
+}
+
+.confirm-row {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    padding: .5rem 0;
+    border-bottom: 1px solid rgba(63, 111, 168, .1);
+}
+
+.confirm-row:last-child {
+    border-bottom: none;
+}
+
+.confirm-row-icon {
+    font-size: 1.05rem;
+    flex-shrink: 0;
+}
+
+.confirm-row-text {
+    flex: 1;
+}
+
+.confirm-row-label {
+    font-size: .58rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text-light);
+}
+
+.confirm-row-val {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: .95rem;
+    color: var(--blue-deep);
+}
+
+.step-btns {
+    display: flex;
+    gap: .7rem;
+    justify-content: center;
+    margin-top: .9rem;
+}
+
+.rsvp-step2-btns {
+    margin-top: .7rem;
+}
+
+.btn-back {
+    padding: .75rem 1.6rem;
+    background: transparent;
+    border: 1px solid rgba(63, 111, 168, .35);
+    border-radius: 30px;
+    color: var(--text-mid);
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    font-size: .8rem;
+    letter-spacing: .04em;
+    cursor: pointer;
+    transition: all .3s;
+}
+
+.btn-back:hover {
+    background: var(--powder);
+}
+
+.btn-next {
+    padding: .75rem 2rem;
+    background: var(--gold-deep);
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    font-family: 'Quicksand', sans-serif;
+    font-size: .8rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 6px 20px rgba(63, 111, 168, .3);
+    transition: transform .2s, box-shadow .2s;
+}
+
+.btn-next:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(63, 111, 168, .4);
+}
+
+/* paso 0 del RSVP: "Continuar" no existe hasta que se elige sí/no
+   (selectAttend() agrega .is-visible) — display:none en vez de
+   opacity:0 a propósito, para que también libere el espacio que
+   ocupaba mientras no hace falta */
+#rsvpNextBtn {
+    display: none;
+}
+
+#rsvpNextBtn.is-visible {
+    display: inline-block;
+}
+
+.btn-confirm {
+    width: 100%;
+    padding: .95rem 1.6rem;
+    background: linear-gradient(135deg, var(--blue), var(--blue-deep));
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    font-family: 'Quicksand', sans-serif;
+    font-size: .82rem;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 8px 24px rgba(63, 111, 168, .3);
+    transition: transform .3s, box-shadow .3s;
+}
+
+.btn-confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(63, 111, 168, .4);
+}
+
+.success-msg {
+    display: none;
+    width: 100%;
+}
+
+.success-inner {
+    background: rgba(255, 255, 255, .8);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(63, 111, 168, .25);
+    border-radius: 22px;
+    padding: 2.2rem 1.6rem;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.success-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    font-size: 1.6rem;
+    color: var(--blue-deep);
+    margin-bottom: .7rem;
+}
+
+.success-sub {
+    font-family: 'Quicksand', sans-serif;
+    font-size: .9rem;
+    color: var(--text-mid);
+    line-height: 1.6;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PANTALLA 5 · DESPEDIDA
+   ══════════════════════════════════════════════════════════════ */
+.p5-mascot {
+    position: relative;
+    z-index: 2;
+    width: clamp(130px, 36vw, 200px);
+    filter: drop-shadow(0 10px 20px var(--glow));
+    margin-bottom: clamp(.6rem, 3vh, 1.2rem);
+}
+
+.p5-title {
+    position: relative;
+    z-index: 3;
+    font-family: 'Alex Brush', cursive;
+    font-size: clamp(2.8rem, 12vw, 4.2rem);
+    color: var(--gold-deep);
+    filter: drop-shadow(0 4px 18px rgba(248, 250, 252, .9));
+}
+
+/* enlace "contáctame" (promociona el servicio de invitaciones, basado
+   en bautizo/) — igual que .p1-mascot, anclado por su cuenta al fondo
+   de la pantalla (position:absolute) en vez de vivir en el flujo junto
+   a oso+título, para que quede claramente más abajo que ese grupo en
+   vez de solo agregarse debajo de él dentro del bloque centrado */
+.p5-footer {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(.8rem, 3vh, 1.6rem);
+    transform: translateX(-50%);
+    z-index: 3;
+    width: max-content;
+    max-width: 90%;
+    text-align: center;
+    /* pastilla de fondo: al quedar tan cerca del borde inferior, ahí el
+       degradado ya remata en --blue-light (poco contraste con
+       --text-light) y encima puede coincidir con las flores de
+       marco_b.png — con un fondo propio se lee bien sin importar qué
+       haya detrás */
+    padding: .4rem .9rem;
+    border-radius: 20px;
+    background: rgba(248, 250, 252, .85);
+    box-shadow: 0 4px 14px rgba(63, 111, 168, .12);
+    font-size: clamp(.72rem, calc(min(100vw, 560px) * 0.031), .82rem);
+    letter-spacing: .02em;
+    color: var(--text-mid);
+}
+
+.p5-footer a {
+    color: var(--gold-deep);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(201, 166, 89, .5);
+    cursor: pointer;
+    transition: color .2s, border-color .2s;
+}
+
+.p5-footer a:hover {
+    color: var(--blue-deep);
+    border-color: var(--blue-deep);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RESPONSIVE · ajustes para pantallas bajas (misma técnica que sofi/)
+   ══════════════════════════════════════════════════════════════ */
+@media (max-height: 700px) {
+    /* única excepción al 50% de arriba: esta sí responde a una restricción
+       real de ALTO de pantalla (no de ancho), así que no compite con esa
+       regla ni reintroduce el bug de vw — sigue en % del contenedor */
+    .p1-mascot {
+        width: 38%;
+    }
+
+    .p1-title {
+        font-size: clamp(2.1rem, 10vw, 3rem);
+    }
+
+    .p1-name {
+        font-size: clamp(2.1rem, 9vw, 3.2rem);
+    }
+
+    .p2-content {
+        gap: clamp(.6rem, 2.4vh, 1rem);
+    }
+
+    .ded-line {
+        font-size: .88rem;
+    }
+
+    .p2-mascot {
+        width: clamp(70px, 18vw, 100px);
+    }
+
+    .p3-content {
+        gap: .4rem;
+    }
+
+    .ev3-month {
+        font-size: clamp(1.8rem, 7vw, 2.4rem);
+    }
+
+    .ev3-day-num {
+        font-size: clamp(2rem, 8vw, 2.7rem);
+    }
+
+    .ev3-location-img {
+        aspect-ratio: 7 / 2;
+    }
+
+    .ev3-location-body {
+        padding: .45rem .8rem .6rem;
+    }
+
+    .pcd-content {
+        gap: .7rem;
+    }
+
+    .cd-mascot {
+        width: clamp(70px, 16vw, 100px);
+    }
+
+    .cd-heading {
+        font-size: clamp(1.1rem, 5vw, 1.4rem);
+    }
+
+    .cd-num {
+        font-size: clamp(1.5rem, 6vw, 2rem);
+    }
+
+    .prsvp-content {
+        gap: .5rem;
+    }
+
+    .rsvp-heading {
+        font-size: clamp(1.1rem, 5vw, 1.4rem);
+    }
+
+    .rsvp-stepper {
+        max-height: 52vh;
+        max-height: 52svh;
+    }
+
+    .attend-option {
+        padding: 1rem .7rem;
+    }
+
+    .p5-mascot {
+        width: clamp(95px, 26vw, 140px);
+    }
+
+    .p5-title {
+        font-size: clamp(2.1rem, 10vw, 3rem);
+    }
+}
+
+@media (max-height: 560px) {
+    .deco-marco {
+        max-height: 26vh;
+    }
+
+    .ded-line {
+        font-size: .68rem;
+    }
+
+    /* pantallas muy bajas: la dirección en texto ya no cabe cómoda —
+       se quita, la tarjeta sigue llevando a Maps igual con nombre+foto */
+    .ev3-location-addr {
+        display: none;
+    }
+
+    .ev3-location-body {
+        padding: .4rem .8rem .55rem;
+    }
+
+    .p2-content {
+        gap: .5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .icon-dove-chalice {
+        width: clamp(58px, 22vw, 80px);
+    }
+}
