@@ -6,6 +6,12 @@ const skyBg = document.getElementById('skyBg');
 const flightThought = document.getElementById('flightThought');
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/* Contador de visitas vía el conector genérico de shared/firebase-connect.js
+   (ver README.md en la raíz del repo). Id propio de esta invitación, no
+   confundir con el 5vu4o de mi-bautizo/miguel-sebastian. */
+const INVITATION_ID = 'we6wn';
+window.SIFirebase && window.SIFirebase.trackVisit(INVITATION_ID);
+
 function rand(min, max) { return Math.random() * (max - min) + min; }
 
 // Small flat cloud puff, built from 2-3 overlapping ellipses like the

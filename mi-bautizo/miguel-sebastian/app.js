@@ -16,9 +16,9 @@ const EVENT_LOCATION = 'Finca Santa Isabel, Tepotzotlán';
    FIREBASE — contador de visitas + registro de confirmaciones RSVP
    Mecánica igual a gali/app.js (SDK compat, transactions), estructura
    de datos nueva de README.md: invitations/{id}/contadores/...
-   El config (proyecto "siempre-invitados") viene de
-   shared/firebase-config.js — ver README.md para el porqué de
-   window.firebaseConfig en vez de un objeto inline aquí.
+   El config (proyecto "siempre-invitados") viene de shared/firebase-config.js
+   en la raíz del repo (cargado por index.html) — ver README.md para el
+   porqué de window.firebaseConfig en vez de un objeto inline aquí.
    ══════════════════════════════════════════════════════════════ */
 const INVITATION_ID = '5vu4o';
 let db = null;
