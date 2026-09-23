@@ -2,11 +2,11 @@
   /* Scene 1 palette: pink & black. Variable names kept as-is (navy/gold/
      cream) since they're referenced throughout the file — only the
      actual color values change here. */
-  --navy-deep: #1A1116;
-  --navy-mid: #2E1A24;
-  --gold: #E8447C;
-  --gold-soft: #F291B5;
-  --cream: #FBE4EC;
+  --navy-deep: #40303A;
+  --navy-mid: #5D4152;
+  --gold: #F0829F;
+  --gold-soft: #F7BDD3;
+  --cream: #FDF0F6;
   --white: #FFFFFF;
   /* Party theme (scene 2): vibrant purple/fuchsia with bright gold */
   --party-deep: #3B0B5C;
@@ -93,15 +93,19 @@ body {
 }
 
 /* ---------- Sky backdrop: shown only during the cap's flight ----------
-   Sits behind the navy background and fades in/out over it. Soft blue
-   gradient with a few simple flat clouds, evoking daytime sky. */
+   Sits behind the navy background and fades in/out over it. Warm sunset
+   gradient (dusk violet up top fading through coral to a golden glow
+   near the horizon) with a soft sun glow, so the flight reads as
+   golden-hour instead of daytime. */
 .sky-bg {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
   height: 100svh;
-  background: linear-gradient(to bottom, #BFE3F5 0%, #DCEFFA 55%, #EFF7FC 100%);
+  background:
+    radial-gradient(circle at 50% 90%, rgba(255, 214, 158, 0.9) 0%, rgba(255, 214, 158, 0) 45%),
+    linear-gradient(to bottom, #4A3B6B 0%, #8B4F7A 32%, #E96A6A 62%, #FFA968 85%, #FFD9A0 100%);
   opacity: 0;
   pointer-events: none;
   z-index: 1;
@@ -116,8 +120,8 @@ body {
   height: 100%;
 }
 
-.cloud { fill: #FFFFFF; opacity: 0.9; }
-.cloud.soft { opacity: 0.7; }
+.cloud { fill: #FFE9D6; opacity: 0.92; }
+.cloud.soft { opacity: 0.72; }
 
 /* Background clouds drift slowly downward — same direction as the
    rush-clouds in front, just much slower, so they read as distant sky
@@ -343,7 +347,7 @@ body {
   animation: cloudFall linear forwards;
 }
 .rush-cloud svg { display: block; width: 100%; height: 100%; }
-.rush-cloud .puff { fill: #FFFFFF; }
+.rush-cloud .puff { fill: #FFE9D6; }
 
 /* Slower, floaty fall (not a fast streak) so each puff clearly reads as
    a cloud drifting past, not a blur */
