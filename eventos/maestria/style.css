@@ -1,0 +1,873 @@
+:root {
+  /* Scene 1 palette: pink & black. Variable names kept as-is (navy/gold/
+     cream) since they're referenced throughout the file — only the
+     actual color values change here. */
+  --navy-deep: #40303A;
+  --navy-mid: #5D4152;
+  --gold: #F0829F;
+  --gold-soft: #F7BDD3;
+  --cream: #FDF0F6;
+  --white: #FFFFFF;
+  /* Party theme (scene 2): vibrant purple/fuchsia with bright gold */
+  --party-deep: #3B0B5C;
+  --party-mid: #6A1B8C;
+  --party-fuchsia: #E63E9C;
+  --party-gold: #F5C518;
+  --party-cream: #FCE9F5;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+*, *::before, *::after { box-sizing: border-box; }
+/* Remove the default blue tap-highlight/focus-ring flash on touch and
+   click for every button in the page — outline is replaced deliberately
+   via :focus-visible on each button instead, for keyboard users. */
+button {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+button:focus:not(:focus-visible) { outline: none; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); height: 100%; }
+
+body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  color: var(--white);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+/* ---------- Two-scene ripple reveal ----------
+   Both scenes are full-screen and stacked (not side by side). Scene 2
+   sits on top but is clipped to a tiny circle centered on the reveal
+   button, so it's invisible until that circle grows to cover the whole
+   screen — a Material-style "ripple" reveal instead of a slide. */
+.scene-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  height: 100svh;
+}
+
+.scene {
+  width: 100%;
+  height: 100%;
+  height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.scene-1 {
+  background: radial-gradient(ellipse 120% 80% at 50% 0%, var(--navy-mid), var(--navy-deep) 65%);
+  z-index: 1;
+}
+.scene-2 {
+  background: radial-gradient(ellipse 120% 80% at 50% 0%, var(--party-mid), var(--party-deep) 65%);
+  z-index: 2;
+  clip-path: circle(3px at var(--reveal-x, 50%) var(--reveal-y, 92%));
+  /* Invisible until the reveal button has actually appeared and its real
+     tap position has been measured — otherwise this 3px circle at the
+     fallback coordinates paints as a faint dot from page load, visible
+     through the whole cap-launch animation before anyone can tap it. */
+  opacity: 0;
+  transition: clip-path 0.95s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.01s linear;
+}
+.scene-2.armed {
+  opacity: 1;
+}
+.scene-track.on-scene-2 .scene-2 {
+  clip-path: circle(150% at var(--reveal-x, 50%) var(--reveal-y, 92%));
+}
+
+/* Once fully revealed, drop scene 1 out of the layout/paint so it can't
+   be scrolled or focused into, and clear scene-2's clip so nothing
+   lingers clipped if the viewport is resized afterward. */
+.scene-track.on-scene-2 .scene-1 {
+  visibility: hidden;
+}
+
+/* ---------- Sky backdrop: shown only during the cap's flight ----------
+   Sits behind the navy background and fades in/out over it. Warm sunset
+   gradient (dusk violet up top fading through coral to a golden glow
+   near the horizon) with a soft sun glow, so the flight reads as
+   golden-hour instead of daytime. */
+.sky-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  height: 100svh;
+  background:
+    radial-gradient(circle at 50% 90%, rgba(255, 214, 158, 0.9) 0%, rgba(255, 214, 158, 0) 45%),
+    linear-gradient(to bottom, #4A3B6B 0%, #8B4F7A 32%, #E96A6A 62%, #FFA968 85%, #FFD9A0 100%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 0.9s ease;
+}
+.sky-bg.visible { opacity: 1; }
+
+.sky-bg svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cloud { fill: #FFE9D6; opacity: 0.92; }
+.cloud.soft { opacity: 0.72; }
+
+/* Background clouds drift slowly downward — same direction as the
+   rush-clouds in front, just much slower, so they read as distant sky
+   rather than competing with the foreground motion. One-way, no
+   back-and-forth reversal (which was reading as the motion "undoing"
+   itself midway). */
+.cloud-group {
+  animation: driftDown 6s linear infinite;
+}
+.cloud-group.g2 { animation-duration: 7.5s; animation-delay: -2s; }
+@keyframes driftDown {
+  0%   { transform: translateY(-6%); }
+  100% { transform: translateY(10%); }
+}
+
+.card {
+  width: 100%;
+  max-width: 460px;
+  min-height: 100vh;
+  min-height: 100svh;
+  /* Bottom padding leaves room so the last details row doesn't sit under
+     the fixed reveal button/hint in the bottom-left corner. */
+  padding: 2rem 1.75rem calc(1.6rem + 96px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.eyebrow {
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  color: var(--gold-soft);
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.card.revealed .eyebrow { opacity: 1; }
+
+/* ---------- Stage for the cap animation ---------- */
+/* Full-height stage: the cap starts at the very bottom of the screen and
+   travels almost the full viewport height before settling near the top. */
+.stage {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  height: 100svh;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* The cap-wrap box itself is what we reposition (left/top/right/bottom),
+   never transform:translate — that keeps every phase's position simple,
+   absolute, and easy to reason about, with no compounding math. Only
+   scale() and rotate() live in the transform property. */
+/* .cap-wrap handles position/scale; .cap-spin (inner wrapper) handles
+   rotation on its OWN linear timing, independent of the outer easing.
+   This is what makes the spin feel like a constant, unbroken speed the
+   whole flight instead of slowing down whenever the position's easing
+   eases out (which is most of the time, since position needs the
+   dramatic ease for a natural throw/fall arc). */
+.cap-wrap {
+  /* Shrinks on narrow viewports so its final scaled-up size (see
+     setCornerTarget() in script.js, which measures this box) doesn't
+     reach far enough across the screen to collide with the next-scene
+     button/hint bubble fixed in the bottom-left corner. Stays at its
+     original 150px on tablets/desktop, where there's room to spare. */
+  --cap-size: clamp(84px, 30vw, 150px);
+  position: absolute;
+  left: 50%;
+  bottom: -160px;
+  width: var(--cap-size);
+  height: var(--cap-size);
+  margin-left: calc(var(--cap-size) / -2);
+  transform-origin: center;
+  transform: scale(1);
+  transition: none;
+  z-index: 6;
+}
+.cap-spin {
+  width: 100%;
+  height: 100%;
+  transform-origin: center;
+  /* Base/rest angle. Once the fall phase's spin animation finishes, JS
+   * adds .spin-done which pins this exact same visual angle (-1080deg ≡
+   * 0deg) directly via transform — so when the "fall" class is removed
+   * and the .cap-wrap.fall .cap-spin animation rule stops applying,
+   * there is no jump back to 0deg: .spin-done already holds that same
+   * angle in place through settle. The cap spins throughout BOTH launch
+   * and fall (that continuous spin while dropping is part of the throw)
+   * and only stops for the final landing wobble in the corner. */
+  transform: rotate(0deg);
+}
+.cap-spin.spin-done {
+  transform: rotate(-1080deg);
+}
+.cap-wrap svg { display: block; width: 100%; height: 100%; position: relative; z-index: 2; }
+
+/* Phase classes toggled by JS. Position/scale on .cap-wrap use dramatic
+   easing for a natural throw/fall feel; rotation on .cap-spin always
+   runs linear so the spin speed never visibly changes. Both share the
+   same total duration per phase so they stay in lockstep. */
+.cap-wrap.launch {
+  animation: launchMove 3.4s cubic-bezier(0.13, 0.55, 0.28, 1) forwards;
+}
+/* Runs "forwards" for an exact whole number of 360° turns (not
+   "infinite") so it lands cleanly on a known angle with zero jump when
+   the class changes to "fall" next — infinite would get cut off
+   mid-turn, which caused a stray extra spin. */
+.cap-wrap.launch .cap-spin {
+  animation: spinLaunch 3.4s linear forwards;
+}
+@keyframes launchMove {
+  0%   { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-80svh) scale(1.7); }
+}
+@keyframes spinLaunch {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(-720deg); }
+}
+
+/* Fall carries the cap from the peak straight down AND sideways into the
+   bottom-right corner in one continuous move, still spinning at the same
+   constant speed all the way down. --fall-x/--fall-y are set by JS right
+   before this phase starts, computed from the cap's actual measured box
+   and the real viewport size, so the resting position is always correct
+   regardless of screen size — no guessed vw/svh math. */
+.cap-wrap.fall {
+  animation: fallMove 1.3s cubic-bezier(0.38, 0, 0.34, 1) forwards;
+}
+.cap-wrap.fall .cap-spin {
+  animation: spinFall 1.3s linear forwards;
+}
+@keyframes fallMove {
+  0%   { transform: translateY(-80svh) translateX(0) scale(1.7); }
+  100% { transform: translateY(var(--fall-y, 0px)) translateX(var(--fall-x, 0px)) rotate(-8deg) scale(2.3); }
+}
+/* Continues from launch's exact end angle (-720deg = 0deg visually) at
+   the same constant speed, landing on another clean multiple of 360° */
+@keyframes spinFall {
+  0%   { transform: rotate(-720deg); }
+  100% { transform: rotate(-1080deg); }
+}
+
+/* By the time settle runs, .cap-spin has already stopped cleanly on
+   -1080deg (visually identical to 0deg) — no rotation left to apply, so
+   settle only does a tiny landing wobble on position/scale, with no
+   further spin. This is the ONLY point the spin stops. */
+.cap-wrap.settle {
+  animation: settleWobble 0.5s ease-out forwards;
+}
+@keyframes settleWobble {
+  0%   { transform: translateY(var(--fall-y, 0px)) translateX(var(--fall-x, 0px)) rotate(-8deg) scale(2.3); }
+  50%  { transform: translateY(calc(var(--fall-y, 0px) + 6px)) translateX(var(--fall-x, 0px)) rotate(-8deg) scale(2.26); }
+  100% { transform: translateY(var(--fall-y, 0px)) translateX(var(--fall-x, 0px)) rotate(-8deg) scale(2.29); }
+}
+
+/* ---------- Flight thought: a floating line of text, centered near the
+   bottom, shown partway through the launch. Plain text, no speech-bubble
+   shape — easy to read against the sky. ---------- */
+.flight-thought {
+  position: fixed;
+  left: 50%;
+  bottom: 14%;
+  transform: translate(-50%, 8px);
+  width: 88%;
+  max-width: 320px;
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.02rem;
+  line-height: 1.45;
+  color: var(--navy-deep);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 7;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.flight-thought-author {
+  display: inline-block;
+  margin-top: 0.3rem;
+  font-family: 'Inter', sans-serif;
+  font-style: normal;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  opacity: 0.75;
+}
+.flight-thought.visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.tassel { transform-origin: 100px 40px; }
+.cap-wrap.launch .tassel { animation: swayBack 3.4s ease-in forwards; }
+.cap-wrap.fall .tassel   { animation: swayFwd 1.3s ease-in forwards; }
+.cap-wrap.settle .tassel { animation: swaySettle 0.6s ease-out forwards; }
+
+/* ---------- Rush clouds: speed sense via clouds streaking past ----------
+   Instead of speed lines, small flat clouds spawn at random heights and
+   shoot downward (opposite the cap's rise) at random sizes/speeds —
+   reads as "the sky rushing past" rather than rain, and matches the
+   sky backdrop already on screen. JS spawns them while the cap launches. */
+.speed-field {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  height: 100svh;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.rush-cloud {
+  position: absolute;
+  top: -80px;
+  opacity: 0;
+  animation: cloudFall linear forwards;
+}
+.rush-cloud svg { display: block; width: 100%; height: 100%; }
+.rush-cloud .puff { fill: #FFE9D6; }
+
+/* Slower, floaty fall (not a fast streak) so each puff clearly reads as
+   a cloud drifting past, not a blur */
+@keyframes cloudFall {
+  0%   { opacity: 0; transform: translateY(0); }
+  15%  { opacity: var(--puff-opacity, 0.9); }
+  80%  { opacity: var(--puff-opacity, 0.9); }
+  100% { opacity: 0; transform: translateY(115vh); }
+}
+
+@keyframes swayBack  { 0% { transform: rotate(0deg); } 100% { transform: rotate(-18deg); } }
+@keyframes swayFwd   { 0% { transform: rotate(-18deg); } 100% { transform: rotate(12deg); } }
+@keyframes swaySettle{ 0% { transform: rotate(12deg); } 60% { transform: rotate(-6deg); } 100% { transform: rotate(0deg); } }
+
+/* Small top breathing room; the cap now rests in a corner, off to the
+   side, so the invitation text can sit higher and centered. */
+.stage-spacer {
+  height: 34px;
+}
+
+/* ---------- Text reveal (hidden until .revealed is added by JS) ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.card.revealed .reveal.r1 { transition-delay: 0.05s; }
+.card.revealed .reveal.r2 { transition-delay: 0.15s; }
+.card.revealed .reveal.r3 { transition-delay: 0.22s; }
+.card.revealed .reveal.r4 { transition-delay: 0.32s; }
+.card.revealed .reveal.r5 { transition-delay: 0.42s; }
+.card.revealed .reveal.r6 { transition-delay: 0.55s; }
+.card.revealed .reveal { opacity: 1; transform: translateY(0); }
+
+.name {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  font-size: clamp(1.7rem, 7vw, 2.15rem);
+  line-height: 1.2;
+  margin: 0.3rem 0 0.35rem;
+  color: var(--white);
+}
+
+.program {
+  font-size: 0.98rem;
+  color: var(--cream);
+  font-weight: 400;
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+.divider {
+  width: 72px;
+  height: 1px;
+  background: var(--gold);
+  margin: 1.4rem 0 1.3rem;
+}
+
+.message {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: var(--cream);
+  max-width: 320px;
+  margin-bottom: 1.5rem;
+}
+
+/* ---------- Mascot sticker: sits above the name, gently floating ---------- */
+.mascot {
+  margin: 0 0 0.6rem;
+}
+
+.mascot-img {
+  display: block;
+  width: 84px;
+  height: auto;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.35));
+  animation: mascotFloat 3.6s ease-in-out infinite;
+}
+
+@keyframes mascotFloat {
+  0%, 100% { transform: rotate(-4deg) translateY(0); }
+  50%      { transform: rotate(-1deg) translateY(-7px); }
+}
+
+/* ---------- Details: vertical timeline ----------
+   A thin gold line runs down the left, connecting three icon nodes
+   (date, time, place) — reads as "how the day unfolds" rather than a
+   flat stack of labels. */
+.details {
+  width: 100%;
+  max-width: 320px;
+  text-align: left;
+}
+
+.detail-row {
+  position: relative;
+  display: flex;
+  gap: 0.95rem;
+  padding-bottom: 1.3rem;
+}
+.detail-row:last-child { padding-bottom: 0; }
+
+/* Connecting line, drawn behind the icon nodes */
+.detail-row:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 17px;
+  top: 38px;
+  bottom: -2px;
+  width: 1px;
+  background: linear-gradient(to bottom, var(--gold), rgba(212, 175, 55, 0.25));
+}
+
+.detail-icon {
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--gold);
+  background: rgba(212, 175, 55, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+.detail-icon svg { width: 17px; height: 17px; display: block; }
+
+.detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-top: 0.35rem;
+}
+
+.detail-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--gold-soft);
+  font-weight: 500;
+}
+
+.detail-value {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--white);
+}
+
+.detail-sub {
+  font-size: 0.86rem;
+  color: rgba(245, 239, 216, 0.75);
+  font-weight: 300;
+}
+
+.detail-map-link {
+  text-decoration: underline;
+  text-decoration-color: rgba(245, 239, 216, 0.4);
+  text-underline-offset: 2px;
+  transition: color 0.2s ease;
+}
+
+.detail-map-link:hover,
+.detail-map-link:focus-visible {
+  color: var(--gold-soft);
+}
+
+/* ---------- Scene 1 → 2 handoff button ---------- */
+/* Large, fixed, pinned to the bottom-left CORNER — its own center is the
+   exact point the circle clip-path grows from (see --reveal-x/y, set by
+   JS from this button's measured position). The wrap itself is sized to
+   the button only, so the button never shifts position; the hint label
+   is absolutely positioned off to the side instead of sharing flex
+   layout with it. */
+.next-scene-wrap {
+  position: fixed;
+  left: max(22px, env(safe-area-inset-left, 0px) + 16px);
+  bottom: max(28px, env(safe-area-inset-bottom, 0px) + 18px);
+  z-index: 8;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+.next-scene-wrap.shown {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* "Tap me" hint: hidden at first, fades in a few seconds after the
+   button appears, positioned just above the button so the button's own
+   corner position never moves. */
+/* Speech-bubble style callout: dark fill + gold border so it reads
+   clearly against any part of the background, with a small tail
+   pointing down toward the button it belongs to. */
+.next-scene-hint {
+  position: absolute;
+  left: 0;
+  bottom: 100%;
+  margin-bottom: 0.85rem;
+  width: max-content;
+  white-space: nowrap;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  color: var(--cream);
+  background: rgba(10, 46, 92, 0.92);
+  border: 1px solid var(--gold);
+  border-radius: 14px;
+  padding: 0.6rem 0.85rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+}
+.next-scene-hint::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 22px;
+  width: 12px;
+  height: 12px;
+  background: rgba(10, 46, 92, 0.92);
+  border-right: 1px solid var(--gold);
+  border-bottom: 1px solid var(--gold);
+  transform: translateY(-7px) rotate(45deg);
+}
+.next-scene-hint.shown {
+  animation: hintBlink 1.8s ease-in-out infinite;
+}
+
+@keyframes hintBlink {
+  0%, 100% { opacity: 0; }
+  15%, 85% { opacity: 1; }
+}
+
+.next-scene-btn {
+  width: 66px;
+  height: 66px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--gold);
+  border: none;
+  color: var(--navy-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(212, 175, 55, 0.45);
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+.next-scene-btn svg { width: 28px; height: 28px; }
+
+/* Sits still at first; once .next-scene-wrap gets .attention (a few
+   seconds after appearing, alongside the "tap me" hint), it grows and
+   shrinks a few times to visibly invite a tap, then settles back down.
+   The hint bubble itself (below) keeps blinking indefinitely afterward,
+   until the button is actually tapped. */
+.next-scene-wrap.attention .next-scene-btn {
+  animation: pulseBtn 1.6s ease-in-out 3;
+}
+@keyframes pulseBtn {
+  0%, 100% { box-shadow: 0 4px 18px rgba(212, 175, 55, 0.45); transform: scale(1); }
+  50%      { box-shadow: 0 6px 30px rgba(212, 175, 55, 0.75); transform: scale(1.16); }
+}
+
+/* ---------- Site credit ----------
+   A single fixed element outside both scenes (like .next-scene-wrap),
+   so it stays pinned at the very bottom, centered, across both scene 1
+   and scene 2 without needing a copy per scene. */
+.site-credit {
+  position: fixed;
+  left: 50%;
+  bottom: max(10px, env(safe-area-inset-bottom, 0px) + 8px);
+  transform: translateX(-50%);
+  z-index: 9;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.45);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.site-credit:hover,
+.site-credit:focus-visible {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .next-scene-btn,
+  .next-scene-wrap.attention .next-scene-btn { animation: none; }
+  .next-scene-hint.shown { animation: none; opacity: 1; }
+}
+
+/* ---------- Scene 2: party theme ---------- */
+/* ---------- Scene 2: asymmetric collage layout ----------
+   Not a centered column — the name sits large and left-aligned, tilted,
+   up in the top third; the message sits loose lower-right; balloons and
+   static confetti scatter across the whole screen as free-floating
+   decoration rather than a grouped icon block. */
+.party-card {
+  width: 100%;
+  height: 100%;
+  max-width: 460px;
+  padding: 0 1.6rem;
+  position: relative;
+  color: var(--party-cream);
+}
+
+.party-eyebrow {
+  position: absolute;
+  top: max(30px, env(safe-area-inset-top, 0px) + 22px);
+  left: 1.6rem;
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+  color: var(--party-gold);
+  font-weight: 500;
+}
+
+/* Balloons: scattered, free-floating, different sizes/positions — no
+   longer a single grouped icon at the top. Each bobs independently. */
+.party-balloon {
+  position: absolute;
+  animation: partyBob 3.4s ease-in-out infinite;
+}
+.party-balloon svg { display: block; }
+.party-balloon.b1 { top: 14%; right: -6%; width: 118px; animation-delay: 0s; }
+.party-balloon.b2 { bottom: 30%; left: -8%; width: 84px; animation-delay: 0.9s; }
+.party-balloon.b3 { top: 48%; right: 4%; width: 56px; animation-delay: 1.7s; opacity: 0.85; }
+
+@keyframes partyBob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-14px) rotate(2deg); }
+}
+
+/* Static scattered confetti dots/shapes — ambient decoration sitting
+   behind the text, separate from the falling confetti burst. */
+.party-static-confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.party-static-confetti span {
+  position: absolute;
+  border-radius: 2px;
+  opacity: 0.55;
+}
+
+.party-name {
+  position: absolute;
+  top: 20%;
+  left: 1.7rem;
+  right: 18%;
+  z-index: 2;
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  font-size: clamp(1.9rem, 9vw, 2.5rem);
+  line-height: 1.18;
+  color: #FFFFFF;
+  text-align: left;
+  transform: rotate(-2.5deg);
+  transform-origin: left top;
+}
+.party-name-highlight {
+  color: var(--party-fuchsia);
+}
+
+.party-message {
+  position: absolute;
+  top: 52%;
+  right: 1.7rem;
+  left: 22%;
+  z-index: 2;
+  font-size: 1.12rem;
+  line-height: 1.5;
+  color: var(--party-cream);
+  text-align: right;
+}
+
+/* Birthday cake: sits in the same bottom-right corner spot the cap
+   lands in on scene 1, as a matching decorative "seal" for this scene —
+   static (no throw animation), large, mostly off-screen. */
+.party-cake {
+  position: absolute;
+  right: -22%;
+  bottom: -13%;
+  width: 72%;
+  max-width: 300px;
+  z-index: 1;
+  transform: rotate(-6deg);
+  filter: drop-shadow(0 10px 26px rgba(0, 0, 0, 0.35));
+}
+.party-cake svg { display: block; width: 100%; height: auto; }
+
+.prev-scene-btn {
+  position: absolute;
+  bottom: max(28px, env(safe-area-inset-bottom, 0px) + 20px);
+  left: 1.6rem;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(26, 17, 22, 0.35);
+  border: 1px solid var(--party-gold);
+  color: var(--party-gold);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.65rem 1.15rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.prev-scene-btn:hover,
+.prev-scene-btn:focus-visible {
+  background: rgba(245, 197, 24, 0.15);
+  color: #FFFFFF;
+}
+
+/* ---------- Confetti: fires once when scene 2 becomes active ---------- */
+.confetti-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
+}
+.confetti-piece {
+  position: absolute;
+  top: -30px;
+  width: 8px;
+  height: 14px;
+  opacity: 0;
+  animation: confettiFall linear forwards;
+}
+@keyframes confettiFall {
+  0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
+  8%   { opacity: 1; }
+  92%  { opacity: 0.9; }
+  100% { opacity: 0; transform: translateY(115vh) rotate(600deg); }
+}
+
+/* Balloons rising from the bottom edge alongside the confetti burst */
+.balloon-piece {
+  position: absolute;
+  bottom: -140px;
+  width: 46px;
+  height: 58px;
+  opacity: 0;
+  animation: balloonRise linear forwards;
+}
+.balloon-piece svg { display: block; width: 100%; height: 100%; }
+
+@keyframes balloonRise {
+  0%   { opacity: 0; transform: translateY(0) translateX(0); }
+  10%  { opacity: 0.95; }
+  50%  { transform: translateY(-58vh) translateX(var(--drift, 14px)); }
+  100% { opacity: 0; transform: translateY(-118vh) translateX(0); }
+}
+
+/* ---------- Large viewports: don't let the content cluster at the top ----------
+   .card is a top-aligned column with min-height: 100vh, which works fine on
+   phones (content roughly fills the screen), but on tall/wide screens
+   (tablets, desktop, big monitors) it leaves a large empty gap below,
+   making everything look bunched up top. Center it instead once there's
+   real room to spare in both dimensions. */
+@media (min-width: 700px) and (min-height: 700px) {
+  .card {
+    justify-content: center;
+  }
+}
+
+/* ---------- Very small devices: keep the corners clear ----------
+   On the narrowest/shortest phones the settled cap and the next-scene
+   button still ended up crowding each other and the LUGAR row. Scoped
+   tightly (max-width OR max-height) so normal/medium/large devices —
+   already confirmed correct — are completely untouched. */
+@media (max-width: 360px), (max-height: 680px) {
+  .cap-wrap {
+    --cap-size: clamp(64px, 24vw, 150px);
+  }
+  .next-scene-btn {
+    width: 56px;
+    height: 56px;
+  }
+  .next-scene-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+  .card {
+    padding: 1.6rem 1.4rem calc(1.2rem + 80px);
+  }
+  .stage-spacer {
+    height: 16px;
+  }
+  .mascot {
+    margin: 0 0 0.5rem;
+  }
+  .mascot-img {
+    width: 62px;
+  }
+  .divider {
+    margin: 0.9rem 0;
+  }
+  .message {
+    margin-bottom: 0.9rem;
+  }
+  .detail-row {
+    padding-bottom: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cap-wrap { position: relative; top: auto; margin: 0 auto; transform: scale(0.5) !important; animation: none !important; }
+  .tassel { animation: none !important; }
+  .mascot-img { animation: none !important; transform: rotate(-4deg); }
+  .reveal { transition: none !important; }
+  .card { opacity: 1; }
+  .party-hero { animation: none !important; }
+  .confetti-piece, .balloon-piece { display: none !important; }
+  .scene-track .scene-2 { transition: none !important; }
+  .next-scene-wrap { transition: none !important; }
+}

@@ -28,8 +28,10 @@
          de bautizo2 — no el mismo que gali/sofi/admin) — sin defer y primero
          de todos: es local/minúsculo, así queda listo antes que cualquier
          otro script sin depender del orden entre scripts diferidos.
-         Ver README.md para el porqué de window.firebaseConfig. -->
-    <script src="../shared/firebase-config.js"></script>
+         Ver README.md para el porqué de window.firebaseConfig. Ruta
+         absoluta porque el archivo real vive en shared/ en la raíz del
+         repo (se movió ahí para que lo compartan proyectos nuevos). -->
+    <script src="/shared/firebase-config.js"></script>
     <!-- auto-hospedado (antes cdnjs): evita bloquear el render en conexiones
          lentas y quita una dependencia de red externa -->
     <script src="resources/vendor/gsap.min.js?v=1" defer></script>
