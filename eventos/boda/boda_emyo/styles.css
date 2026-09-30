@@ -1,0 +1,1586 @@
+:root{
+  --paper:#fffdf7;
+  --paper-edge:#fbf3e2;
+  --envelope:#fdf6e8;
+  --envelope-dark:#f3e4bd;
+  --envelope-darker:#e6cd8e;
+  --accent:#c9a227;
+  --accent-line:#d9b94f;
+  --accent-soft:#f0dfa0;
+  --ink:#4a3c1e;
+  --ink-soft:#8a6f2e;
+  --shadow: rgba(120, 95, 20, 0.22);
+}
+
+*{ box-sizing: border-box; }
+
+/* Kills the browser-default blue tap-highlight/focus ring on every
+   clickable element (11 buttons + 5 links + the 2 rsvp-attend-option
+   divs, the only clickable non-button/anchor elements) while keeping a
+   visible on-brand outline for keyboard-only (Tab) navigation. */
+button, a, .rsvp-attend-option{
+  -webkit-tap-highlight-color: transparent;
+}
+button:focus, a:focus, .rsvp-attend-option:focus{ outline: none; }
+button:focus-visible, a:focus-visible, .rsvp-attend-option:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+html, body{
+  margin:0;
+  padding:0;
+  background: linear-gradient(180deg,#fffdf7 0%, #f7ecd3 50%, #efe0b0 100%);
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 18px; /* base bump from the browser default 16px — nearly
+    every text size on the page is a rem-based clamp(), so this scales
+    all of them up together in one place rather than editing each one */
+  color: var(--ink);
+  /* No overflow-x:hidden on html/body on purpose: setting overflow on
+     either forces the other axis to a non-visible value too, which
+     breaks position:sticky on any descendant. */
+}
+
+/* ---------- Hero text ---------- */
+/* Lives INSIDE .stage (an overlay, not a separate section before the
+   scroll scene) so .scroll-section stays the very first element in
+   <body> — that's what keeps .scene-sticky already "stuck" at
+   scrollY=0, showing the real progress=0 render immediately instead of
+   a partially-scrolled-past hero pushing it below the fold. Positioned
+   well above the envelope's resting visible band; JS fades it out in
+   the first sliver of scroll. */
+.hero-text{
+  position:absolute;
+  top: 0;
+  left:0;
+  width: 100%;
+  height: min(44vh, 360px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content: flex-end;
+  text-align:center;
+  padding: 0 20px clamp(20px, 4vh, 36px);
+  z-index: 95;
+  pointer-events:none;
+  overflow: hidden;
+}
+.hero-photo-wrap{
+  position:absolute;
+  inset: 0;
+  z-index: 0;
+}
+.hero-photo{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+  display: block;
+}
+.hero-photo-wrap::after{
+  content:"";
+  position:absolute;
+  inset: 0;
+  /* Fades the photo into the page's own paper tone at the bottom, where
+     the names sit, for legibility — a soft blend, not a hard crop. */
+  background: linear-gradient(180deg,
+    rgba(74,60,30,0.12) 0%,
+    rgba(74,60,30,0.02) 30%,
+    rgba(255,253,247,0.55) 75%,
+    #fffdf7 100%);
+}
+.hero-copy{
+  position:relative;
+  z-index: 1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+}
+.hero-names{
+  font-family: 'Great Vibes', cursive;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 10vw, 4.4rem);
+  line-height: 1.15;
+  color: var(--ink);
+  margin: 0 0 12px 0;
+}
+.hero-amp{
+  color: var(--accent);
+  font-style: italic;
+}
+.hero-tagline{
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: clamp(0.7rem, 1.7vw, 0.88rem);
+  color: var(--ink);
+  margin: 0;
+}
+
+/* ---------- Scroll section ---------- */
+.scroll-section{
+  position: relative;
+  height: 1150vh; /* envelope enters, rises, opens+sinks to a ~65%-peek
+                      marker together, the sheet threads out through it
+                      and grows nearly full-screen, then the invitation
+                      scrolls internally inside the sheet, then everything
+                      exits upward together. Raised from 1000vh so the new
+                      dwell band (script.js, progress 0.60-0.78 — content
+                      fully visible/static, nothing auto-closes) gets real
+                      scroll distance to live in (every phase's pixel
+                      length scales with this value), and so the invitation
+                      overall reads as longer/less rushed. */
+}
+
+.scene-sticky{
+  /* position:fixed instead of sticky: nothing follows .scroll-section in
+     normal document flow (Scene 2's RSVP elements are all position:fixed
+     overlays), so there was never a real reason for this to "un-stick" at
+     all — fixed produces identical behavior throughout the whole scroll
+     animation (updateScene()'s progress comes from .scroll-section's own
+     getBoundingClientRect(), independent of this element's positioning
+     scheme) while avoiding a sticky-positioning edge case: right at the
+     scroll position where the RSVP phase begins, .scene-sticky was
+     silently un-sticking (likely a sub-pixel mismatch between the
+     browser's own vh basis and this page's own scroll math), scrolling
+     the whole envelope out of view even though its CSS was correct. */
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow: hidden;
+}
+
+.stage{
+  position:relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Wrapper around #envelope/#envelopeBack — added so Scene 2 (the RSVP
+   ending) can rotate/scale/fly the whole envelope as one rigid unit
+   instead of applying the same transform to each element separately.
+   Deliberately no width/height/transform here: it has no size of its own
+   (its children are position:absolute, which don't contribute to a
+   parent's size), but that's fine — each child's own top:50%;left:50%
+   resolves against this 0x0 point, and each child's own translate(-50%,
+   ...) is self-referencing (percentages in translate() use the element's
+   OWN box, not the parent's), so they still land exactly where they did
+   before this wrapper existed. Scene 1's updateScene() never touches this
+   element; only script.js's Scene-2 IIFE sets a transform on it, and only
+   during the RSVP phase. */
+#envelop-wrapper{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+/* ---------- Envelope ---------- */
+/* Sized to the brief: 90% of viewport width (capped so it doesn't get
+   absurd on ultra-wide screens), height kept at the envelope's natural
+   ~0.68 aspect ratio. This box stays this size for the ENTIRE animation
+   — the envelope never shrinks — only its Y position and open/closed
+   state change. */
+.envelope{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width: min(90vw, 640px);
+  height: min(90vw * 0.68, 640px * 0.68);
+  transform: translate(-50%, -50%);
+  transform-style: preserve-3d;
+  will-change: transform;
+  /* IMPORTANT: this needs an explicit z-index because .sheet is a DOM
+     SIBLING (not a child) living in the same .stage stacking context.
+     Without this, .envelope children's own z-index values (1/5/20/25/30)
+     only rank against each other inside .envelope's box — they can never
+     out-rank .sheet, which compares directly against .envelope AS A
+     WHOLE. Giving .envelope z-index 10 places it correctly between the
+     sheet's "tucked" (2) and "cleared the front layer" (60) states, so
+     the sandwich actually works across the sibling boundary. */
+  z-index: 10;
+}
+
+/* Back panel: the rear wall of the envelope. This is the layer that
+   stays BEHIND the sheet at all times — the "capa de atrás" — so the
+   sheet is always in front of this one specific layer. It's a .stage-
+   level sibling of .envelope (see the z-index note on .envelope above)
+   so its z-index (1) can independently sit below the sheet's every
+   state, sized/positioned in lockstep with .envelope via JS. */
+.envelope-back{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width: min(90vw, 640px);
+  height: min(90vw * 0.68, 640px * 0.68);
+  background: linear-gradient(180deg, var(--envelope) 0%, var(--envelope-dark) 100%);
+  border-radius: 18px;
+  box-shadow:
+    0 32px 64px -18px var(--shadow),
+    0 14px 28px -10px rgba(60,45,20,0.28),
+    0 4px 10px -4px rgba(60,45,20,0.2);
+  z-index: 1;
+  will-change: transform;
+}
+.envelope-back::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius: 18px;
+  background:
+    linear-gradient(115deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 30%),
+    linear-gradient(245deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 30%);
+  pointer-events:none;
+}
+.envelope-back-border{
+  position:absolute;
+  inset:0;
+  border-radius: 18px;
+  border: 1.5px solid var(--accent);
+  opacity: 0.75;
+  pointer-events:none;
+}
+
+/* Backstop liner: same tone as the envelope, covers the back panel's
+   full rectangle. It sits ABOVE the back panel but BELOW the sheet
+   while the sheet is meant to look fully hidden (closed state), and
+   fades away once the sheet starts threading out, so that from then on
+   only the true "sandwich" layering (back behind, pocket+flap in
+   front) is what's doing the work. */
+.envelope-liner{
+  position:absolute;
+  inset:0;
+  background: linear-gradient(200deg, var(--envelope) 0%, var(--envelope-dark) 100%);
+  border-radius: 18px;
+  z-index: 5;
+}
+
+/* Front pocket: the lower V-notched panel — the "capa de adelante" that
+   sits IN FRONT of the sheet while the sheet is still low enough to be
+   behind the notch line. */
+.envelope-pocket{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  height: 62%;
+  background: linear-gradient(180deg, var(--envelope-dark) 0%, var(--envelope-darker) 100%);
+  clip-path: polygon(0% 0%, 50% 35.5%, 100% 0%, 100% 100%, 0% 100%);
+  border-radius: 0 0 18px 18px;
+  /* filter, not box-shadow: box-shadow would just get clipped away by the
+     V-notch clip-path above; drop-shadow follows the clipped silhouette
+     itself, giving the notch some real depth against the pocket/flap
+     below it. */
+  filter: drop-shadow(0 -3px 8px rgba(60,45,20,0.22));
+  z-index: 20;
+}
+.envelope-pocket::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  clip-path: polygon(0% 0%, 50% 35.5%, 100% 0%, 100% 100%, 0% 100%);
+  border: 1.5px solid var(--accent);
+  opacity: 0.6;
+}
+
+/* Wax seal, adapted from resources/sello-de-cera.html (a standalone demo
+   page, not a real custom element — its HTML/CSS is inlined here). #seal
+   itself KEEPS its pre-existing position/top/left/z-index/transform-origin
+   contract unchanged — script.js's updateScene() writes seal.style.transform
+   and .opacity on this exact element every frame, same as before; only the
+   flat-circle look is replaced by the richer nested seal__* structure.
+   --color-sello/--tamano-sello etc. are scoped to .seal (not the page's
+   global :root) so they don't leak into the rest of the site's palette. */
+.seal{
+  --color-sello: var(--accent);
+  --tamano-sello: 110px;
+  --cera-clara: color-mix(in srgb, var(--color-sello) 60%, #fff);
+  --cera-oscura: color-mix(in srgb, var(--color-sello) 55%, #000);
+  --cera-grabado: color-mix(in srgb, var(--color-sello) 70%, #000);
+  --u: calc(var(--tamano-sello) / 260);
+  position:absolute;
+  left:50%;
+  top:56%;
+  width: var(--tamano-sello);
+  height: var(--tamano-sello);
+  transform: translate(-50%,-50%);
+  z-index: 30;
+  transform-origin: center;
+}
+.seal__sombra{
+  position:absolute;
+  inset:0;
+  filter:
+    drop-shadow(0 calc(2 * var(--u)) calc(2 * var(--u)) rgb(0 0 0 / .35))
+    drop-shadow(0 calc(9 * var(--u)) calc(11 * var(--u)) rgb(0 0 0 / .30));
+}
+.seal__cera{
+  position:absolute;
+  inset:0;
+  clip-path: url(#silueta-cera);
+  background:
+    radial-gradient(closest-side, transparent 68%, rgb(0 0 0 / .30) 84%, transparent 96%),
+    radial-gradient(ellipse at 36% 28%, var(--cera-clara) 0%, var(--color-sello) 55%, var(--cera-oscura) 120%);
+}
+.seal__cera::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(from 0deg,
+    transparent 0deg, rgb(255 255 255 / .25) 20deg, transparent 60deg,
+    transparent 100deg, rgb(255 255 255 / .42) 140deg, transparent 185deg,
+    transparent 250deg, rgb(255 255 255 / .60) 300deg, rgb(255 255 255 / .75) 335deg, transparent 360deg);
+  -webkit-mask: radial-gradient(closest-side, transparent 78%, #000 92%, transparent 100%);
+          mask: radial-gradient(closest-side, transparent 78%, #000 92%, transparent 100%);
+}
+.seal__cuenca{
+  position:absolute;
+  inset:13%;
+  border-radius: 50% 48% 51% 49% / 49% 51% 49% 51%;
+  background: radial-gradient(circle at 62% 62%, var(--color-sello), var(--cera-oscura) 140%);
+  box-shadow:
+    inset calc(7 * var(--u)) calc(9 * var(--u)) calc(16 * var(--u)) rgb(0 0 0 / .55),
+    inset calc(-4 * var(--u)) calc(-5 * var(--u)) calc(10 * var(--u)) rgb(255 255 255 / .16),
+    0 calc(2 * var(--u)) calc(1 * var(--u)) rgb(255 255 255 / .35),
+    0 calc(-1 * var(--u)) calc(2 * var(--u)) rgb(0 0 0 / .35);
+}
+.seal__cuno{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width: 54%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: linear-gradient(145deg, var(--cera-clara) -20%, var(--color-sello) 55%, var(--cera-oscura) 130%);
+  box-shadow:
+    calc(4 * var(--u)) calc(6 * var(--u)) calc(8 * var(--u)) rgb(0 0 0 / .45),
+    calc(-1.5 * var(--u)) calc(-1.5 * var(--u)) calc(2 * var(--u)) rgb(255 255 255 / .28);
+}
+.seal__cuno::before{
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 38%, var(--color-sello), var(--cera-oscura) 170%);
+  box-shadow:
+    inset calc(3 * var(--u)) calc(4 * var(--u)) calc(6 * var(--u)) rgb(0 0 0 / .50),
+    inset calc(-2 * var(--u)) calc(-3 * var(--u)) calc(4 * var(--u)) rgb(255 255 255 / .20),
+    0 calc(1 * var(--u)) 0 rgb(255 255 255 / .30);
+}
+.seal__texto{
+  position:relative;
+  font-family: Georgia, "Times New Roman", "Palatino Linotype", serif;
+  display:inline-flex;
+  align-items:center;
+  gap:.1em;
+  font-size: calc(var(--tamano-sello) * .17);
+  font-weight:700;
+  line-height:1;
+  color: var(--cera-grabado);
+  text-shadow:
+    0 calc(1.5 * var(--u)) 0 rgb(255 255 255 / .32),
+    0 calc(-1 * var(--u)) 0 rgb(0 0 0 / .55);
+  user-select:none;
+}
+.seal__inicial{ display:block; }
+.seal__inicial--1{ transform: translateY(-.2em); }
+.seal__inicial--2{ transform: translateY(.2em); }
+.seal__amp{ font-size:.6em; font-style:italic; }
+
+/* Flap: a true 3D two-faced panel hinged at the top edge. This is the
+   other half of the "capa de adelante" — while closed it covers the
+   sheet from the front along with the pocket; opening it swings it out
+   of the way so the sheet can thread out through the gap it leaves. */
+.envelope-flap{
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  height: 58%;
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  /* Same reasoning as .envelope-pocket: filter/drop-shadow follows the
+     triangular clip-path silhouette (a box-shadow on the clipped face
+     below would just get clipped away), giving the flap real depth as it
+     swings open/closed. */
+  filter: drop-shadow(0 10px 18px rgba(60,45,20,0.28));
+  z-index: 25;
+  will-change: transform;
+}
+.envelope-flap-face{
+  position:absolute;
+  inset:0;
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+  backface-visibility: hidden;
+}
+.envelope-flap-front{
+  background: linear-gradient(200deg, var(--envelope) 0%, var(--envelope-dark) 100%);
+}
+.envelope-flap-front::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+  border: 1.5px solid var(--accent);
+  opacity: 0.65;
+}
+.envelope-flap-back{
+  background: linear-gradient(340deg, var(--envelope-darker) 0%, var(--envelope-dark) 100%);
+  transform: rotateY(180deg);
+}
+
+/* ---------- Sheet / invitation card ---------- */
+/* A sibling of .envelope in .stage (not a child), so it can grow past
+   the envelope's own box freely. Its z-index is driven entirely by JS
+   to thread it between the back panel (behind) and the pocket/flap
+   (in front) — the literal "sandwich" the brief describes — rather
+   than ever just sitting flatly on top of the whole envelope. */
+.sheet{
+  position:absolute;
+  left:50%;
+  top:50%;
+  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-edge) 100%);
+  border-radius: 4px;
+  box-shadow:
+    0 20px 40px -12px rgba(60,45,20,0.35),
+    0 2px 6px rgba(60,45,20,0.12);
+  overflow:hidden;
+  will-change: transform, width, height;
+}
+
+.sheet::before{
+  content:"";
+  position:absolute;
+  inset: clamp(6px, 2.4%, 22px);
+  border: 1px solid var(--accent-line);
+  opacity: 0.45;
+  pointer-events:none;
+}
+
+/* Fade mask over the sheet's top/bottom edges so the internal content
+   scroll (see .sheet-content) never hard-clips text mid-line — it reads
+   as a window onto a longer page rather than an abrupt crop. */
+.sheet::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(180deg,
+    var(--paper) 0%, rgba(255,253,247,0) 8%,
+    rgba(255,253,247,0) 92%, var(--paper-edge) 100%);
+  pointer-events:none;
+}
+
+/* Real photo bouquet, top-left corner only (the other 3 corners keep the
+   hand-drawn .sheet-corner SVG below). Mirrored horizontally so the
+   image's own dense cluster — naturally in ITS top-right — lands right at
+   this corner. Sized by width only (height:auto) to preserve the source
+   PNG's 1600:872 aspect ratio. */
+.sheet-corner-photo{
+  /* Lives in normal flow as .sheet-content's first child now (not
+     position:absolute against .sheet) so it scrolls away with the reading
+     content instead of hovering fixed over the top-left corner for the
+     whole reading phase — align-self pins it to the LEFT edge of the
+     (centered) content column specifically, standing out from the rest. */
+  align-self: flex-start;
+  /* Pull flush against .sheet's true top-left corner, canceling both the
+     things that would otherwise leave a gap: -48px cancels .sheet-content's
+     own padding-top exactly (a fixed, known value); -9.5% cancels the
+     horizontal inset from .sheet-content being centered narrower than
+     .sheet (content is min(560px,84%) of .sheet, i.e. 84% on mobile before
+     that 560px cap engages — margins are % of the CHILD's own containing
+     block width, i.e. .sheet-content's width, so canceling an 8%-of-.sheet
+     inset takes 8/84 ≈ 9.5% of .sheet-content's own width). Exact only
+     below the 560px/620px caps (mobile) — on wider screens the ratio drifts
+     slightly, but the photo is capped small there anyway so it matters less. */
+  margin: -48px 0 0 -9.5%;
+  /* Same 88vw fraction as .sheet's own width formula (bigW in script.js,
+     min(88vw,620px)) — below the 320px cap here, both share that identical
+     term, so this tracks the sheet's own width almost exactly on phones
+     ("spans the invitation"), while past that point it freezes at a much
+     smaller cap than the sheet's own 620px ceiling, staying a contained
+     corner accent on tablet/desktop instead of growing further. */
+  width: min(88vw, 320px);
+  height: auto;
+  transform: scaleX(-1);
+  opacity: 1;
+  pointer-events:none;
+}
+
+/* Trailing floral garland, flush against .sheet's true right edge, near
+   the top. Positioned absolute directly against .sheet itself (its own
+   sibling in the DOM, not nested in .sheet-content) — the same technique
+   .sheet-corner already uses for pixel-exact edge placement — rather than
+   a percentage-margin cancellation, which only ever approximates
+   .sheet-content's own width ratio. Stays fixed within the sheet's
+   viewport for the whole reading phase (like the corner ornaments do)
+   instead of scrolling with the text. "Behind the text": #sheetContent
+   comes after this in the DOM, so its (opaque) content always paints in
+   front of it — no z-index needed. Mirrored (scaleX(-1)). */
+.inv-right-flower{
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(50vw, 230px);
+  height: auto;
+  opacity: 0.2;
+  pointer-events: none;
+  transform: scaleX(-1);
+}
+
+/* Floral corner ornaments — fixed to .sheet itself (not .sheet-content),
+   so they frame the card and never scroll away with the long content. */
+.sheet-corner{
+  position:absolute;
+  top: 10px;
+  left: 10px;
+  width: clamp(64px, 13vw, 92px);
+  height: clamp(64px, 13vw, 92px);
+  z-index: 3;
+  pointer-events:none;
+  opacity: 0.85;
+}
+.sheet-corner--right{
+  left:auto;
+  right: 10px;
+  transform: scaleX(-1);
+}
+.sheet-corner--bottom-left{
+  top:auto;
+  bottom: 10px;
+  transform: scaleY(-1);
+}
+.sheet-corner--bottom-right{
+  top:auto;
+  bottom: 10px;
+  left:auto;
+  right: 10px;
+  transform: scale(-1, -1);
+}
+
+
+/* Invitation content: a long, tall stack of sections. Once the sheet has
+   finished growing to its full reading size, this block's own height far
+   exceeds the sheet's — the sheet's overflow:hidden turns it into a fixed
+   "window", and JS translates this element upward through that window as
+   scroll progress advances through the long content-reading band, top to
+   bottom, like scrolling a document. */
+.sheet-content{
+  position:absolute;
+  left:50%;
+  top:0;
+  transform: translateX(-50%); /* JS overwrites with translate(-50%, npx) every frame */
+  width: min(560px, 84%);
+  opacity: 0;
+  padding: 48px 0 clamp(190px, 26vh, 280px); /* this whole band is blank
+    paper between the gift buttons and the sheet's own bottom edge; the
+    floating #confirmAttendanceBtn (see its own `bottom` offset in
+    .confirm-float-btn) sits inside it, splitting it into a gap BEFORE
+    the button (content-to-button) and a bigger gap AFTER it
+    (button-to-sheet-edge — the visible room for the remaining "dwell"
+    scroll, script.js progress 0.60-0.72). (The outro auto-play's actual
+    safety margin is that dwell band, not this padding.) Bumped from
+    140/20vh/210 — the "before" sub-gap was only ~30-40px in the old
+    values (sheet is vh-10 tall, so the button's own viewport-bottom
+    offset eats almost all of this band), too tight against real mobile
+    viewport-height quirks (iOS Safari's collapsing toolbar etc.), which
+    was reported as the gift buttons being unclickable in part of their
+    area — the confirm button was overlapping their bottom edge. */
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+  gap: clamp(14px, 2.6vh, 26px);
+}
+
+/* Only the opening name/date block sits clear of the corner photo above
+   it by right-aligning — the rest of the invitation stays centered. */
+.inv-intro-right{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  text-align:right;
+  gap: clamp(18px, 3.2vh, 34px);
+  width:100%;
+  /* Same section-break spacing as .inv-line's own margin (see there) —
+     this block has no divider after it before the "Escucha nuestra
+     canción" title, so the gap is added directly here instead. */
+  margin-bottom: clamp(36px, 7vh, 80px);
+}
+
+.inv-eyebrow{
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  font-size: clamp(0.68rem, 1.25vw, 0.9rem);
+  color: var(--ink-soft);
+}
+/* Sits between the small eyebrow line and the big cursive names — a
+   step up in size/weight from the eyebrow, a step down from .inv-names,
+   so it reads as the invitation's own short announcement rather than
+   competing with either. */
+.inv-announce{
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: clamp(1.1rem, 2.6vw, 1.5rem);
+  font-weight: 600;
+  color: var(--accent);
+}
+.inv-names{
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(2.6rem, 7.8vw, 5.4rem);
+  color: var(--ink);
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0;
+}
+.inv-amp{
+  display:block;
+  font-size: 0.55em;
+  color: var(--accent);
+  margin: 0.1em 0;
+}
+/* A thin gold rule with a small centered diamond — a classic stationery
+   divider motif ("—◆—"). CSS-only, so it applies to every existing
+   .inv-line in the markup with no HTML changes. */
+.inv-line{
+  position:relative;
+  width: 48px;
+  height: 1px;
+  background: var(--accent);
+  /* Extra breathing room specifically at section breaks (on top of
+     .sheet-content's own base flex gap, which stays tighter so a title
+     stays snug against the content right below it) — .inv-line/
+     .inv-flower-divider are what actually mark a new section starting. */
+  margin-top: clamp(36px, 7vh, 80px);
+  margin-bottom: clamp(36px, 7vh, 80px);
+}
+/* Real photo divider, used in place of .inv-line at a few well-spaced
+   section breaks only (not every one — see index.html) so it reads as an
+   occasional flourish rather than replacing the page's whole rhythm of
+   thin gold-line dividers. */
+.inv-flower-divider{
+  width: min(46vw, 200px);
+  height: auto;
+  margin-top: clamp(36px, 7vh, 80px); /* same section-break bonus as .inv-line */
+  margin-bottom: clamp(36px, 7vh, 80px);
+}
+.inv-line::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.inv-date{
+  font-size: clamp(1.05rem, 1.75vw, 1.4rem);
+  letter-spacing: 0.1em;
+  color: var(--ink);
+}
+.inv-rings{
+  width: 62px;
+  height: auto;
+}
+.inv-block-title{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-size: clamp(0.7rem, 1.1vw, 0.88rem);
+  color: var(--accent);
+}
+.inv-title-icon{
+  width: 62px;
+  height: 62px;
+  flex-shrink: 0;
+}
+.inv-block-body{
+  font-size: clamp(0.95rem, 1.55vw, 1.15rem);
+  color: var(--ink);
+  line-height: 1.8;
+}
+.inv-block-body strong{
+  font-weight: 600;
+}
+
+/* ---------- Song ---------- */
+/* Floating player + timed lyrics, ported from eventos/gali's own music
+   player (see its app.js showNextLyric/startLyrics/resumeLyrics/
+   pauseLyrics/resetLyrics and style.css .music-player rules) — same
+   mechanism, re-themed with this page's own paper/gold palette instead of
+   gali's pink one. .inv-song-container reserves layout space so nothing
+   jumps when #invSong switches to position:fixed once "sticky" (see the
+   sticky-check inside script.js's updateScene()). */
+.inv-song-container{
+  width: 100%;
+  min-height: 60px; /* approximates #invSong's own collapsed height —
+    same approximation gali's min-height:52px makes for its own player */
+}
+.inv-song{
+  display:flex;
+  align-items:center;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  width: 100%;
+  border: 1px solid var(--accent-line);
+  border-radius: 999px;
+  padding: 10px 16px 10px 10px;
+  background: rgba(255,255,255,0.5);
+  transition: background 0.25s ease, max-width 0.3s ease, padding 0.3s ease;
+}
+.inv-song.expanded{
+  border-radius: 20px;
+}
+/* Positioning itself lives on #invSongStickySlot, not here — #invSong is
+   a DOM descendant of #sheetContent/.sheet, both of which get a fresh
+   inline `transform` every frame (script.js's updateScene()), and any
+   `transform` on an ancestor becomes the containing block for a
+   `position:fixed` descendant (per spec) instead of the viewport. A
+   `position:fixed` rule here would just silently follow that transform
+   around rather than actually pinning to the screen — the fix is
+   physically re-parenting #invSong into the body-level
+   #invSongStickySlot (see script.js), so this class only needs to carry
+   the compact "floating" look. */
+.inv-song.sticky{
+  /* No width override here — .inv-song's own base width:100% now fills
+     whatever pixel width script.js stamps onto #invSongStickySlot right
+     before docking (measured from #invSong's own rendered width at that
+     exact moment), so it keeps the same width it had inline instead of
+     shrinking to fit its content. */
+  background: rgba(255,253,247,0.92);
+  box-shadow: 0 10px 30px -10px rgba(60,45,20,0.35);
+}
+/* Body-level (sibling of #scrollSection, like #confirmAttendanceBtn) so
+   it sits outside every transformed/overflow:hidden ancestor Scene 1
+   uses — a real position:fixed anchor #invSong gets moved into and out
+   of, never itself carrying any content of its own otherwise. Its width
+   is set inline by script.js at the moment of docking, not here. */
+#invSongStickySlot{
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50; /* above the envelope/sheet (.scene-sticky, its own
+    stacking context, paints at auto/0) — below the floating confirm
+    button (96) and well below the rsvp-backdrop (999) */
+}
+.inv-song-play-btn{
+  flex-shrink:0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.inv-song-play-btn:hover{ background: var(--ink-soft); }
+.inv-song-play-btn::before{
+  content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='white' viewBox='0 0 16 16'><polygon points='5,3 13,8 5,13'/></svg>");
+}
+.inv-song-play-btn.playing::before{
+  content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='white' viewBox='0 0 16 16'><rect x='4' y='2' width='2.4' height='12'/><rect x='9.6' y='2' width='2.4' height='12'/></svg>");
+}
+.inv-song-info{
+  display:flex;
+  flex-direction:column;
+  text-align:left;
+  line-height:1.3;
+  min-width: 0;
+}
+.inv-song-title{ font-size: 1.05rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.inv-song-artist{ font-size: 0.85rem; color: var(--ink-soft); }
+.inv-song-bars{
+  flex-shrink:0;
+  display:flex;
+  align-items:flex-end;
+  gap: 2px;
+  height: 18px;
+  margin-left: auto;
+}
+.inv-song-bar{
+  width: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform-origin: bottom;
+  transform: scaleY(0.3);
+  opacity: 0.5;
+}
+.inv-song-bar:nth-child(1){ height: 10px; }
+.inv-song-bar:nth-child(2){ height: 17px; }
+.inv-song-bar:nth-child(3){ height: 13px; }
+.inv-song-bar:nth-child(4){ height: 19px; }
+.inv-song-bar:nth-child(5){ height: 8px; }
+.inv-song-bar.playing{ animation: inv-song-bar-bounce 0.8s ease-in-out infinite alternate; }
+.inv-song-bar.playing:nth-child(1){ animation-delay: 0s; }
+.inv-song-bar.playing:nth-child(2){ animation-delay: .15s; }
+.inv-song-bar.playing:nth-child(3){ animation-delay: .05s; }
+.inv-song-bar.playing:nth-child(4){ animation-delay: .25s; }
+.inv-song-bar.playing:nth-child(5){ animation-delay: .1s; }
+@keyframes inv-song-bar-bounce{
+  0%{ transform: scaleY(0.3); opacity:0.5; }
+  100%{ transform: scaleY(1); opacity:1; }
+}
+.inv-song-spotify{
+  flex-shrink:0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--accent-line);
+  color: var(--accent);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+  font-size: 0.85rem;
+  transition: background 0.2s ease;
+}
+.inv-song-spotify:hover{ background: rgba(255,255,255,0.6); }
+.inv-song-lyrics{
+  width: 100%;
+  text-align:center;
+  min-height: 2.4rem;
+  display:none;
+}
+.inv-song.expanded .inv-song-lyrics{ display:block; }
+.inv-song-lyric-line{ display:none; }
+.inv-song-lyric-current{
+  font-style: italic;
+  font-size: clamp(0.85rem, 1.6vw, 1rem);
+  color: var(--ink-soft);
+  line-height: 1.4;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.inv-song-lyric-current.visible{ opacity:1; transform:translateY(0); }
+.inv-song-lyric-translation{
+  font-size: clamp(0.7rem, 1.3vw, 0.82rem);
+  color: var(--ink-soft);
+  font-style: normal;
+  display: block;
+  margin-top: 0.2rem;
+}
+
+/* ---------- Venue cards ---------- */
+.inv-venue{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap: 8px;
+  width: 100%;
+  border: 1px solid var(--accent-line);
+  border-radius: 10px;
+  padding: 18px 20px;
+}
+.inv-venue-name{
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: clamp(0.85rem, 1.2vw, 1rem);
+  color: var(--accent);
+}
+.inv-venue-name-sub{
+  font-size: clamp(0.95rem, 1.55vw, 1.15rem);
+  color: var(--ink);
+  line-height: 1.6;
+}
+.inv-venue-addr{
+  font-size: clamp(0.8rem, 1.15vw, 0.92rem);
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+.inv-venue-time{
+  font-size: clamp(0.88rem, 1.3vw, 1rem);
+  color: var(--ink-soft);
+}
+.inv-venue-btn{
+  display:inline-block;
+  margin-top: 6px;
+  border: 1px solid var(--accent-line);
+  border-radius: 999px;
+  padding: 7px 20px;
+  font-size: clamp(0.8rem, 1.15vw, 0.92rem);
+  letter-spacing: 0.05em;
+  text-decoration:none;
+  color: var(--ink);
+  background: rgba(255,255,255,0.35);
+  transition: background 0.25s ease;
+}
+.inv-venue-btn:hover{ background: rgba(255,255,255,0.6); }
+
+/* ---------- Countdown ---------- */
+.inv-countdown{
+  display:flex;
+  justify-content:center;
+  gap: clamp(14px, 3vw, 30px);
+  width: 100%;
+}
+.inv-countdown-unit{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap: 4px;
+  min-width: 3.2em;
+}
+.inv-countdown-num{
+  font-size: clamp(1.65rem, 3.9vw, 2.6rem);
+  color: var(--ink);
+  line-height: 1;
+}
+.inv-countdown-label{
+  font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.inv-gift-links{
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  width: 100%;
+}
+.inv-gift-btn{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 104px;
+  height: 56px;
+  border: 1px solid var(--accent-line);
+  border-radius: 999px;
+  padding: 0 10px;
+  background: rgba(255,255,255,0.5);
+  transition: background 0.25s ease, transform 0.15s ease;
+}
+.inv-gift-btn:hover{ background: rgba(255,255,255,0.75); }
+.inv-gift-btn:active{ transform: scale(0.97); }
+.inv-gift-logo{
+  max-width: 78px;
+  max-height: 32px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+.inv-final{
+  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+/* ---------- Scroll indicator ---------- */
+.scroll-hint{
+  position:absolute;
+  top: 50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  white-space: nowrap; /* left:50% with no `right` makes the browser size
+    this box's auto-width against only the space up to that 50% point,
+    before the transform re-centers it — without this, longer text (like
+    "Desliza hacia arriba") can wrap even though there's plenty of room
+    once actually centered */
+  transition: opacity 0.5s ease;
+  z-index: 90;
+  pointer-events:none;
+}
+.scroll-hint .arrow{
+  font-size: 1.1rem;
+  animation: bob 1.6s ease-in-out infinite;
+}
+@keyframes bob{
+  0%,100%{ transform: translateY(0); }
+  50%{ transform: translateY(-6px); }
+}
+
+/* ============================================================
+   SCENE 2 — Branching RSVP ending (Branch B only). Not a scrollable
+   section — every element below is position:fixed and parked/hidden by
+   default. script.js reveals them once Scene 1's own scroll-driven
+   timeline settles at progress=1 (window.__boda_emyoOnScene1End) and drives
+   every subsequent visual change directly via inline styles, not CSS
+   attribute-selector states — after two rounds where that pattern quietly
+   reset a property when leaving a state, this round drops it entirely for
+   Scene 2's own elements. No rule here touches #sheet/#flap/#seal from
+   Scene 1; #envelope/#envelopeBack are rotated/flown in place by
+   script.js, inline, on top of their own existing Scene-1 CSS class. */
+.rsvp-card{
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  z-index: 20; /* above .envelope's 10 — reads as "landing on top of it" */
+  width: min(70vw, 300px); /* meaningfully smaller than .envelope's own
+    min(90vw,640px) at every viewport size — at 88vw/360px the two were
+    nearly identical on a phone (~350px vs ~343px), covering the envelope
+    almost entirely and hiding both it and its rotation. This keeps a
+    clear margin (~35-40px per side on a typical phone, much more on
+    desktop) so the envelope reads clearly around the card at all times. */
+  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-edge) 100%);
+  border-radius: 10px;
+  box-shadow: 0 16px 34px -14px rgba(60,45,20,0.32);
+  padding: clamp(18px, 3.5vw, 28px) clamp(16px, 4vw, 24px);
+  max-height: min(76vh, 380px); /* guardrail: none of the 3 wizard steps are
+    expected to hit this under normal conditions — it just guarantees the
+    envelope's scaled-up silhouette (see script.js) can't be silently
+    re-eclipsed if a step's content ever grows later. */
+  overflow-y: auto;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(2.2); /* parked oversized and
+    transparent — matches the exact mechanic of the reference "zoom" effect
+    (mi-bautizo/miguel-sebastian's gallery: gsap.set(cells,{opacity:0,
+    scale:2.2}) shrinking to scale(1)) — no vertical travel at all, the
+    "falling into place" feel comes purely from the dramatic scale-down. */
+}
+
+.rsvp-card-title{
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  color: var(--ink);
+  margin: 0 0 14px;
+  text-align: center;
+}
+
+/* ---------- 3-step wizard (attend choice -> name+guests -> review) ----------
+   Structure/interaction pattern adapted from mi-bautizo/miguel-sebastian's
+   own RSVP screen (index.html:199-256, app.js:449-483) — same step-dot +
+   shake-on-invalid-advance idiom, same "guest counter hidden when declining"
+   behavior. Persistence itself stays local-only per boda_emyo's own earlier,
+   separate decision — this is a UI/UX adaptation, not a backend one. */
+.rsvp-step{
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+}
+.rsvp-step.active{
+  display: flex;
+  animation: rsvp-step-in 0.4s ease;
+}
+@keyframes rsvp-step-in{
+  from{ opacity: 0; transform: translateY(16px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
+
+.rsvp-step-hint{
+  font-size: clamp(0.85rem, 1.4vw, 1rem);
+  color: var(--ink);
+  text-align: center;
+  margin: 0;
+}
+.rsvp-attend-cards{
+  display: flex;
+  gap: 10px;
+}
+.rsvp-attend-option{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 10px;
+  border: 1px solid var(--accent-line);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.rsvp-attend-option:hover{ background: rgba(255,255,255,0.4); }
+.rsvp-attend-option.selected{
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+.rsvp-ao-label{
+  font-size: clamp(0.85rem, 1.3vw, 0.98rem);
+  color: var(--ink);
+}
+.rsvp-ao-sub{
+  font-size: clamp(0.68rem, 1vw, 0.78rem);
+  color: var(--ink-soft);
+}
+.rsvp-ao-icon{
+  width: 24px;
+  height: 24px;
+  color: var(--ink-soft);
+  transition: color 0.2s ease;
+}
+.rsvp-attend-option.selected .rsvp-ao-icon{ color: var(--accent); }
+
+.rsvp-dots{
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+.rsvp-dot{
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-line);
+  transition: width 0.25s ease, background 0.25s ease;
+}
+.rsvp-dot.active{
+  width: 18px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+.rsvp-dot.done{ background: var(--accent-line); opacity: 0.7; }
+
+.rsvp-next-btn, .rsvp-back-btn{
+  border: none;
+  border-radius: 999px;
+  padding: 10px 24px;
+  font: inherit;
+  font-size: clamp(0.8rem, 1.1vw, 0.92rem);
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 0.25s ease, opacity 0.25s ease;
+}
+.rsvp-next-btn{
+  align-self: center;
+  color: #fff;
+  background: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+  height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+.rsvp-next-btn.rsvp-visible{
+  opacity: 1;
+  pointer-events: auto;
+  height: auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.rsvp-next-btn:hover{ background: var(--ink-soft); }
+.rsvp-back-btn{
+  background: transparent;
+  color: var(--ink-soft);
+  padding-left: 4px;
+  padding-right: 4px;
+}
+.rsvp-back-btn:hover{ color: var(--ink); }
+.rsvp-step-btns{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.rsvp-step-btns .rsvp-next-btn{ margin-left: auto; }
+
+.rsvp-field{ display:flex; flex-direction:column; gap:6px; text-align:left; }
+.rsvp-field-label{
+  font-size: clamp(0.68rem, 1vw, 0.8rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.rsvp-input{
+  font: inherit;
+  font-size: clamp(0.9rem, 1.3vw, 1rem);
+  padding: 10px 14px;
+  border: 1px solid var(--accent-line);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.55);
+  color: var(--ink);
+  width: 100%;
+}
+
+.rsvp-guest-counter{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.rsvp-counter-btn{
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--accent-line);
+  background: rgba(255,255,255,0.55);
+  color: var(--ink);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.rsvp-counter-num{
+  font-size: 1.1rem;
+  color: var(--ink);
+  min-width: 1.4em;
+  text-align: center;
+}
+.rsvp-counter-label{
+  font-size: clamp(0.72rem, 1vw, 0.85rem);
+  color: var(--ink-soft);
+}
+
+.rsvp-summary{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rsvp-summary-row{
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: clamp(0.82rem, 1.2vw, 0.95rem);
+  color: var(--ink);
+  border-bottom: 1px solid var(--accent-line);
+  padding-bottom: 6px;
+}
+.rsvp-summary-row span{ color: var(--ink-soft); }
+
+.rsvp-submit-btn{
+  margin-top: 4px;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 28px;
+  font: inherit;
+  font-size: clamp(0.85rem, 1.2vw, 1rem);
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: var(--accent);
+  cursor: pointer;
+  transition: background 0.25s ease, opacity 0.25s ease;
+}
+.rsvp-submit-btn:hover{ background: var(--ink-soft); }
+.rsvp-submit-btn:disabled{ opacity: 0.6; cursor: default; }
+.rsvp-error{
+  min-height: 1.2em;
+  margin: 0;
+  font-size: 0.82rem;
+  color: #a83232;
+}
+@keyframes rsvp-shake{
+  10%,90%{ transform: translateX(-4px); }
+  20%,80%{ transform: translateX(6px); }
+  30%,50%,70%{ transform: translateX(-8px); }
+  40%,60%{ transform: translateX(8px); }
+}
+.rsvp-shake{ animation: rsvp-shake 0.4s ease; }
+
+.rsvp-cutscene-title{
+  position: fixed;
+  left: 50%; top: 16%;
+  transform: translateX(-50%);
+  margin: 0;
+  /* Deliberately NOT the site's script font ('Great Vibes') — confirmed
+     against mi-bautizo/miguel-sebastian's own confirmation-sent text
+     (.success-title/.success-sub), which uses Playfair Display / Quicksand,
+     never its script font either. Falls back to the page's own Georgia
+     serif body font. */
+  font-weight: 600;
+  font-size: clamp(1.7rem, 4.4vw, 2.4rem);
+  color: var(--ink);
+  text-align: center;
+  opacity: 0; /* script.js sets this to '1' directly once it has text to show */
+  pointer-events: none;
+  z-index: 25; /* above the envelope (10) and card (20) it appears over */
+  transition: opacity 400ms ease;
+}
+
+.rsvp-backdrop{
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, #efe0b0 0%, #e6cd8e 100%);
+  opacity: 0;
+  z-index: 999; /* above every other z-index this page ever uses */
+  pointer-events: none;
+  transition: opacity 600ms ease;
+}
+/* Same hero photo, reused as a faint full-bleed watermark on the closing
+   screen — object-fit:cover inside an inset:0 box that's itself inside
+   the fixed, full-viewport .rsvp-backdrop fills edge-to-edge with no
+   distortion and no possibility of overflow (same technique as
+   .hero-photo). The backdrop's own gradient paints behind it and still
+   shows through at ~84% strength; fades in together with the backdrop
+   since it's a child of the element script.js animates opacity on. */
+.rsvp-backdrop-photo{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.16;
+}
+
+/* Closing message — Branch A only (already-confirmed returning guest).
+   Fixed overlay text, shown once at the very end of Scene 1's timeline;
+   see script.js's readFlag() branch. Mutually exclusive with the RSVP
+   wizard above (a guest only ever reaches one or the other). */
+/* Shown ON TOP of the (opaque) .rsvp-backdrop AND above the envelope,
+   which script.js brings back above the backdrop too (elevating
+   .scene-sticky's own z-index to 1000 right as this group shows) so it
+   stays visible/centered for the closing message instead of being hidden
+   — these 3 need z-index above THAT elevated value, hence 1010. Positioned
+   above/below the envelope's own resting band (roughly 36%-64% of the
+   viewport height) rather than centered as one group, so they don't
+   overlap it — a first-guess split, worth checking live. */
+.closing-thanks{
+  position: fixed;
+  left: 50%; top: 16%;
+  transform: translateX(-50%);
+  width: min(84vw, 420px);
+  margin: 0;
+  text-align: center;
+  font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+  color: var(--ink);
+  line-height: 1.6;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1010;
+  transition: opacity 900ms ease;
+}
+.closing-names{
+  position: fixed;
+  left: 50%; top: 72%;
+  transform: translateX(-50%);
+  margin: 0;
+  /* Matches .inv-names' own script font — this is a couple-name display,
+     not a system/confirmation message, so the site's cursive font is the
+     right call here (unlike .rsvp-cutscene-title, which deliberately
+     avoids it). */
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  line-height: 1.25;
+  text-align: center;
+  color: var(--ink);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1010;
+  transition: opacity 900ms ease;
+}
+.closing-amp{ color: var(--accent); }
+.closing-again-btn{
+  position: fixed;
+  left: 50%; top: 85%;
+  transform: translateX(-50%);
+  border: none;
+  border-radius: 999px;
+  padding: 12px 30px;
+  font: inherit;
+  font-size: clamp(0.85rem, 1.2vw, 1rem);
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: var(--accent);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1010;
+  transition: opacity 900ms ease, background 0.25s ease;
+}
+.closing-again-btn:hover{ background: var(--ink-soft); }
+
+/* Floating "Confirmar asistencia" button — body-level (sibling of
+   #scrollSection, not nested in .scene-sticky/.stage) so it's never at
+   risk of being clipped by .scene-sticky's own overflow:hidden, and its
+   z-index only needs to clear .scene-sticky's own stacking context (which
+   paints at the default/auto level) — not the rsvp-backdrop (999), which
+   is above it, though by the time that fades in this button is already
+   hidden via its own progress-driven opacity (see script.js). Opacity/
+   pointer-events are written directly from JS every frame (like
+   .scroll-hint's fade already is), not toggled through a CSS class. */
+.confirm-float-btn{
+  position: fixed;
+  left: 50%;
+  bottom: clamp(60px, 10vh, 110px); /* well clear of the viewport's own
+    bottom edge, so most of .sheet-content's bottom padding lands BELOW
+    the button (the "after" gap) rather than almost all of it landing
+    above it (the "before" gap) — see the padding comment there */
+  transform: translateX(-50%);
+  z-index: 96;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  border-radius: 999px;
+  padding: 14px 30px;
+  font: inherit;
+  font-size: clamp(0.85rem, 1.3vw, 1rem);
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 10px 24px -8px rgba(60,45,20,0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, background 0.25s ease;
+}
+.confirm-float-btn:hover{ background: var(--ink-soft); }
+.confirm-float-btn:active{ transform: translateX(-50%) scale(0.96); }
+.confirm-float-icon{ width: 22px; height: 22px; flex-shrink: 0; }
+
+/* ---------- Site credit bar + promo modal ----------
+   Body-level, fixed to the viewport bottom — unlike everything else that
+   lives inside #sheetContent, this is never part of the scrolling card,
+   so it's on screen at every scroll position and during every scene/
+   overlay (RSVP card, closing screen, etc.), not just once a guest
+   scrolls all the way to the end of the reading content. z-index clears
+   the RSVP backdrop (999) and closing screen (1010). */
+.site-credit-footer{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1500;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px 10px;
+  padding: 7px 14px;
+  background: rgba(255,253,247,0.7);
+  border-top: 1px solid var(--accent-line);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  text-align: center;
+}
+.inv-credit-heart{ color: var(--accent); }
+.site-credit-footer a{
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent-line);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.site-credit-footer a:hover{
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.contact-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(74,60,30,0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.contact-overlay.visible{
+  opacity: 1;
+  pointer-events: auto;
+}
+.contact-modal-box{
+  background: rgba(255,253,247,0.98);
+  border: 1px solid var(--accent-line);
+  border-radius: 20px;
+  padding: 2.5rem 2rem 2rem;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 24px 70px rgba(60,45,20,0.28);
+  position: relative;
+  text-align: center;
+  transform: translateY(22px) scale(0.96);
+  transition: transform 0.38s cubic-bezier(0.34,1.56,0.64,1);
+}
+.contact-overlay.visible .contact-modal-box{
+  transform: translateY(0) scale(1);
+}
+.contact-close{
+  position: absolute;
+  top: 1rem;
+  right: 1.2rem;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--ink-soft);
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s ease, transform 0.2s ease;
+  padding: 0.2rem;
+}
+.contact-close:hover{
+  color: var(--ink);
+  transform: rotate(90deg);
+}
+.contact-modal-icon{
+  font-size: 2.2rem;
+  display: block;
+  margin-bottom: 0.8rem;
+}
+.contact-modal-title{
+  font-size: clamp(1.15rem, 2.4vw, 1.4rem);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+  margin: 0 0 10px;
+}
+.contact-modal-sub{
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  line-height: 1.65;
+  margin: 0 0 1.8rem;
+}
+.btn-whatsapp{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.9rem 1.8rem;
+  background: #25d366;
+  border: none;
+  border-radius: 30px;
+  color: #fff;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 6px 20px rgba(37,211,102,0.35);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.btn-whatsapp:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(37,211,102,0.45);
+}
+.btn-whatsapp svg{
+  width: 20px;
+  height: 20px;
+  fill: #fff;
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: reduce){
+  /* #envelope/#envelopeBack aren't listed here — their transitions during
+     the Scene-2 sequence are JS-authored strings built from the same T
+     timing object, which already has its own shortened reduced-motion
+     branch. Only the CSS-transition-driven Scene-2-owned elements need
+     the override here. */
+  .rsvp-card, .rsvp-backdrop, .rsvp-cutscene-title, .closing-thanks, .closing-names, .closing-again-btn{
+    transition-duration: 0.01s !important; /* not 0s — some engines won't
+      reliably fire transitionend for a transition that never actually ran;
+      0.01s still fires it, keeping the JS chain advancing correctly. */
+  }
+  .inv-song-bar.playing{
+    animation: none;
+  }
+}
