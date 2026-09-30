@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boda — Emmanuel &amp; Yoatzi</title>
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Boda — Emmanuel &amp; Yoatzi">
+<meta property="og:description" content="Acompáñanos a celebrar nuestra boda — Sábado 14 de noviembre de 2026.">
+<meta property="og:url" content="https://www.siempreinvitados.com/eventos/boda/boda_emyo/">
+<meta property="og:image" content="https://www.siempreinvitados.com/eventos/boda/boda_emyo/resources/portada.jpeg?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="1200">
+<meta property="og:site_name" content="Siempre Invitados">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Boda — Emmanuel &amp; Yoatzi">
+<meta name="twitter:description" content="Acompáñanos a celebrar nuestra boda — Sábado 14 de noviembre de 2026.">
+<meta name="twitter:image" content="https://www.siempreinvitados.com/eventos/boda/boda_emyo/resources/portada.jpeg?v=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<!-- config de Firebase compartido (proyecto "siempre-invitados") — sin
+     defer y primero de todos: es local/minúsculo, así queda listo antes
+     que cualquier otro script. Ruta absoluta porque el archivo real vive
+     en shared/ en la raíz del repo (ver README.md ahí). No existe en
+     git (shared/firebase-config.js está en .gitignore) — en producción
+     lo genera el build de Cloudflare; en local, si no existe, todo lo
+     de Firebase de esta página queda en no-op y el sitio sigue
+     funcionando igual, sin contador ni RSVP con persistencia remota. -->
+<script src="/shared/firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js" defer></script>
+<!-- conector genérico compartido: expone window.SIFirebase.{db,trackVisit} -->
+<script src="/shared/firebase-connect.js" defer></script>
+</head>
+<body>
+
+<section class="scroll-section" id="scrollSection">
+  <div class="scene-sticky">
+    <div class="stage">
+
+      <!-- Hero text lives inside .stage (not a separate section before it)
+           so .scroll-section is the literal first element in <body> — at
+           scrollY=0 .scene-sticky is already "stuck," showing the full
+           progress=0 render immediately, no scrolling needed first. JS
+           fades this out in the first sliver of scroll. -->
+      <div class="hero-text" id="heroText">
+        <div class="hero-photo-wrap">
+          <!-- Photo: Bruno Mattos, Pexels (pexels.com/photo/elegant-gold-wedding-rings-on-invitation-30232952), free license -->
+          <img class="hero-photo" src="resources/hero-rings.webp" alt="" aria-hidden="true">
+        </div>
+        <div class="hero-copy">
+          <h1 class="hero-names">Emmanuel <span class="hero-amp">&amp;</span> Yoatzi</h1>
+          <p class="hero-tagline">Tienen una invitación para ti</p>
+        </div>
+      </div>
+
+      <!-- Sheet is placed first in the DOM but its stacking is entirely
+           z-index driven, so DOM order here doesn't matter — see JS. -->
+      <div class="sheet" id="sheet">
+        <!-- Floral corner ornaments frame the card itself (not the
+             scrolling content, not the outer viewport) — thin gold
+             line-art, hand-drawn, kept consistent with the site's
+             minimal style rather than a downloaded stock photo. Same
+             artwork reused in the remaining 3 corners via CSS mirroring
+             (see .sheet-corner* rules). A vine with two small leaf-buds,
+             plus a fuller 5-petal blossom near the tip. -->
+        <svg class="sheet-corner sheet-corner--right" viewBox="0 0 100 100" aria-hidden="true">
+          <g fill="none" stroke="var(--accent)" stroke-width="1.4" stroke-linecap="round">
+            <path d="M6 94 C 10 70, 8 45, 26 24 C 34 14, 46 8, 60 6"/>
+            <path d="M20 60 C 28 56, 34 50, 36 42"/>
+            <path d="M34 34 C 40 30, 46 26, 50 18"/>
+            <ellipse cx="38" cy="40" rx="7.5" ry="3.6" transform="rotate(-35 38 40)" fill="var(--accent-soft)"/>
+            <ellipse cx="24" cy="52" rx="6.5" ry="3.2" transform="rotate(-55 24 52)" fill="var(--accent-soft)"/>
+            <ellipse cx="52" cy="16" rx="7" ry="3.4" transform="rotate(-25 52 16)" fill="var(--accent-soft)"/>
+            <circle cx="20" cy="60" r="3" fill="var(--accent)"/>
+            <circle cx="34" cy="34" r="2.6" fill="var(--accent)"/>
+            <ellipse cx="68" cy="6" rx="6" ry="2.8" fill="var(--accent-soft)"/>
+            <ellipse cx="68" cy="6" rx="6" ry="2.8" fill="var(--accent-soft)" transform="rotate(72 60 6)"/>
+            <ellipse cx="68" cy="6" rx="6" ry="2.8" fill="var(--accent-soft)" transform="rotate(144 60 6)"/>
+            <ellipse cx="68" cy="6" rx="6" ry="2.8" fill="var(--accent-soft)" transform="rotate(216 60 6)"/>
+            <ellipse cx="68" cy="6" rx="6" ry="2.8" fill="var(--accent-soft)" transform="rotate(288 60 6)"/>
+            <circle cx="60" cy="6" r="3.6" fill="var(--accent)"/>
+          </g>
+        </svg>
+        <svg class="sheet-corner sheet-corner--bottom-left" viewBox="0 0 100 100" aria-hidden="true">
+          <g fill="none" stroke="var(--accent)" stroke-width="1.4" stroke-linecap="round">
+            <path d="M6 94 C 10 70, 8 45, 26 24 C 34 14, 46 8, 60 6"/>
+            <path d="M20 60 C 28 56, 34 50, 36 42"/>
+            <path d="M34 34 C 40 30, 46 26, 50 18"/>
+            <ellipse cx="38" cy="40" rx="7.5" ry="3.6" transform="rotate(-35 38 40)" fill="var(--accent-soft)"/>
+            <ellipse cx="24" cy="52" rx="6.5" ry="3.2" transform="rotate(-55 24 52)" fill="var(--accent-soft)"/>
+            <ellipse cx="52" cy="16" rx="7" ry="3.4" transform="rotate(-25 52 16)" fill="var(--accent-soft)"/>
+            <circle cx="20" cy="60" r="3" fill="var(--accent)"/>
+            <circle cx="34" cy="34" r="2.6" fill="var(--accent)"/>
+            <ellipse cx="68" cy="6" rx="6" ry="2.8" fill="var(--accent-soft)"/>
+            <ellipse cx="68" cy="6" rx="6" ry="2.8" fill="var(--accent-soft)" transform="rotate(72 60 6)"/>
+            <ellipse cx="68" cy="6" rx="6" ry="2.8" fill="var(--accent-soft)" transform="rotate(144 60 6)"/>
+            <ellipse cx="68" cy="6" rx="6" ry="2.8" fill="var(--accent-soft)" transform="rotate(216 60 6)"/>
+            <ellipse cx="68" cy="6" rx="6" ry="2.8" fill="var(--accent-soft)" transform="rotate(288 60 6)"/>
+            <circle cx="60" cy="6" r="3.6" fill="var(--accent)"/>
+          </g>
+        </svg>
+        <svg class="sheet-corner sheet-corner--bottom-right" viewBox="0 0 100 100" aria-hidden="true">
+          <g fill="none" stroke="var(--accent)" stroke-width="1.4" stroke-linecap="round">
+            <path d="M6 94 C 10 70, 8 45, 26 24 C 34 14, 46 8, 60 6"/>
+            <path d="M20 60 C 28 56, 34 50, 36 42"/>
+            <path d="M34 34 C 40 30, 46 26, 50 18"/>
+            <ellipse cx="38" cy="40" rx="7.5" ry="3.6" transform="rotate(-35 38 40)" fill="var(--accent-soft)"/>
+            <ellipse cx="24" cy="52" rx="6.5" ry="3.2" transform="rotate(-55 24 52)" fill="var(--accent-soft)"/>
+            <ellipse cx="52" cy="16" rx="7" ry="3.4" transform="rotate(-25 52 16)" fill="var(--accent-soft)"/>
+            <circle cx="20" cy="60" r="3" fill="var(--accent)"/>
+            <circle cx="34" cy="34" r="2.6" fill="var(--accent)"/>
+            <ellipse cx="68" cy="6" rx="6" ry="2.8" fill="var(--accent-soft)"/>
+            <ellipse cx="68" cy="6" rx="6" ry="2.8" fill="var(--accent-soft)" transform="rotate(72 60 6)"/>
+            <ellipse cx="68" cy="6" rx="6" ry="2.8" fill="var(--accent-soft)" transform="rotate(144 60 6)"/>
+            <ellipse cx="68" cy="6" rx="6" ry="2.8" fill="var(--accent-soft)" transform="rotate(216 60 6)"/>
+            <ellipse cx="68" cy="6" rx="6" ry="2.8" fill="var(--accent-soft)" transform="rotate(288 60 6)"/>
+            <circle cx="60" cy="6" r="3.6" fill="var(--accent)"/>
+          </g>
+        </svg>
+
+        <!-- Trailing floral garland, flush against .sheet's true left
+             edge — a direct child of .sheet (like the corner ornaments
+             above), NOT .sheet-content, so its position is exact pixels
+             against the real edge instead of a percentage cancellation
+             that has to track .sheet-content's own width ratio. Comes
+             before #sheetContent in the DOM so the letter's text (which
+             follows, opaque) always paints in front of it. -->
+        <img class="inv-right-flower" src="resources/flores_ld.webp" alt="" aria-hidden="true">
+
+        <div class="sheet-content" id="sheetContent">
+
+          <!-- Real photo bouquet (flores_l.webp), mirrored so its own dense
+               cluster — naturally in ITS top-right corner — lands at the
+               top-left. Lives INSIDE the scrolling content now (not fixed
+               to .sheet itself, unlike the 3 remaining SVG corners) so it
+               scrolls away with the text instead of hovering over it for
+               the whole reading phase. -->
+          <img class="sheet-corner-photo" src="resources/flores_l.webp" alt="" aria-hidden="true">
+
+          <!-- Only this opening block (name/date) is right-aligned, to sit
+               clear of the corner photo above it — everything else in the
+               invitation stays centered, per the user's correction. -->
+          <div class="inv-intro-right">
+            <div class="inv-eyebrow">Con la bendición de Dios y nuestras familias</div>
+            <div class="inv-announce">¡Nos casamos!</div>
+            <h1 class="inv-names">Emmanuel<span class="inv-amp">&amp;</span>Yoatzi</h1>
+            <div class="inv-date">Sábado 14 de noviembre de 2026 · 2:00 p.m.</div>
+          </div>
+
+          <div class="inv-block-title">
+            <svg class="inv-title-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M9 17V5l10-2v12" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="7" cy="17" r="2.4" fill="none" stroke="var(--accent)" stroke-width="1.6"/>
+              <circle cx="17" cy="15" r="2.4" fill="none" stroke="var(--accent)" stroke-width="1.6"/>
+            </svg>
+            <span>Escucha nuestra canción</span>
+          </div>
+          <!-- Wrapper reserves layout space (mirrors eventos/gali's own
+               .music-player-container/min-height) so nothing jumps when
+               #invSong switches to position:fixed once "sticky" — see
+               script.js. -->
+          <div class="inv-song-container" id="invSongContainer">
+            <div class="inv-song" id="invSong">
+              <button type="button" class="inv-song-play-btn" id="invSongPlayBtn" aria-label="Reproducir"></button>
+              <div class="inv-song-info">
+                <span class="inv-song-title">Life Eternal</span>
+                <span class="inv-song-artist">Ghost</span>
+              </div>
+              <div class="inv-song-bars" id="invSongBars">
+                <span class="inv-song-bar"></span><span class="inv-song-bar"></span><span class="inv-song-bar"></span><span class="inv-song-bar"></span><span class="inv-song-bar"></span>
+              </div>
+              <a class="inv-song-spotify" href="https://open.spotify.com/search/Life%20Eternal%20Ghost" target="_blank" rel="noopener" aria-label="Abrir en Spotify">♪</a>
+              <!-- First verse, Spanish as the main text, English nested as
+                   the translation. -->
+              <div class="inv-song-lyrics" id="invSongLyrics">
+                <div class="inv-song-lyric-current" id="invSongLyricCurrent"></div>
+                <span class="inv-song-lyric-line" data-duration="6">¿Puedes escucharme decir tu nombre para siempre?<span class="inv-song-lyric-translation">Can you hear me say your name forever?</span></span>
+                <span class="inv-song-lyric-line" data-duration="8">¿Puedes verme anhelando por ti para siempre?<span class="inv-song-lyric-translation">Can you see me longing for you forever?</span></span>
+                <span class="inv-song-lyric-line" data-duration="6">¿Me dejarías tocar tu alma para siempre?<span class="inv-song-lyric-translation">Would you let me touch your soul forever?</span></span>
+                <span class="inv-song-lyric-line" data-duration="6">¿Puedes sentirme anhelando por ti para siempre, siempre?<span class="inv-song-lyric-translation">Can you feel me longing for you forever, forever?</span></span>
+              </div>
+            </div>
+          </div>
+          <audio id="invSongAudio" src="resources/music.mp3" preload="none"></audio>
+
+          <div class="inv-line"></div>
+          <svg class="inv-rings" viewBox="0 0 64 40" aria-hidden="true">
+            <circle cx="24" cy="24" r="14" fill="none" stroke="var(--accent)" stroke-width="2.2"/>
+            <circle cx="40" cy="24" r="14" fill="none" stroke="var(--accent)" stroke-width="2.2"/>
+            <path d="M40 8 L42.2 12.4 46.6 14.6 42.2 16.8 40 21.2 37.8 16.8 33.4 14.6 37.8 12.4 Z" fill="var(--accent)"/>
+          </svg>
+
+          <div class="inv-block-body">
+            Con inmensa alegría queremos compartir contigo el inicio de
+            nuestra nueva vida juntos. Tu presencia y tus buenos deseos
+            harán de este día algo aún más especial para nosotros.
+          </div>
+
+          <div class="inv-line"></div>
+          <div class="inv-block-title">
+            <svg class="inv-title-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/>
+              <circle cx="12" cy="9.5" r="2.4" fill="none" stroke="var(--accent)" stroke-width="1.6"/>
+            </svg>
+            <span>Dónde y cuándo</span>
+          </div>
+
+          <div class="inv-venue">
+            <div class="inv-venue-name">Ceremonia</div>
+            <div class="inv-venue-name-sub">Iglesia La Asunción</div>
+            <div class="inv-venue-addr">Pl. de la Constitución s/n, Centro, 42000 Pachuca de Soto, Hgo.</div>
+            <div class="inv-venue-time">Sábado 14 de noviembre de 2026 · 2:00 p.m.</div>
+            <a class="inv-venue-btn" href="https://maps.app.goo.gl/ecSehSChmFQGSUJK9" target="_blank" rel="noopener">Ver ubicación</a>
+          </div>
+
+          <div class="inv-venue">
+            <div class="inv-venue-name">Recepción</div>
+            <div class="inv-venue-name-sub">Auditorio San Miguel Cerezo</div>
+            <div class="inv-venue-addr">42100 San Miguel Cerezo, Hgo.</div>
+            <div class="inv-venue-time">4:00 p.m.</div>
+            <a class="inv-venue-btn" href="https://maps.app.goo.gl/3KLuxAQDshzRUwK99?g_st=ac" target="_blank" rel="noopener">Ver ubicación</a>
+          </div>
+
+          <div class="inv-line"></div>
+          <div class="inv-block-title">
+            <svg class="inv-title-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="8.5" fill="none" stroke="var(--accent)" stroke-width="1.6"/>
+              <path d="M12 7.5V12l3.2 2" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Cuenta regresiva</span>
+          </div>
+          <div class="inv-countdown" id="countdown">
+            <div class="inv-countdown-unit"><span class="inv-countdown-num" id="cdDays">00</span><span class="inv-countdown-label">Días</span></div>
+            <div class="inv-countdown-unit"><span class="inv-countdown-num" id="cdHours">00</span><span class="inv-countdown-label">Horas</span></div>
+            <div class="inv-countdown-unit"><span class="inv-countdown-num" id="cdMinutes">00</span><span class="inv-countdown-label">Min</span></div>
+            <div class="inv-countdown-unit"><span class="inv-countdown-num" id="cdSeconds">00</span><span class="inv-countdown-label">Seg</span></div>
+          </div>
+
+          <div class="inv-line"></div>
+          <div class="inv-block-title">
+            <svg class="inv-title-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="4" y="10" width="16" height="10" fill="none" stroke="var(--accent)" stroke-width="1.6"/>
+              <path d="M4 10h16M12 10v10" fill="none" stroke="var(--accent)" stroke-width="1.6"/>
+              <path d="M12 10c-1.6 0-3-1-3-2.6C9 6 10.3 5 11.6 5 12.8 5 12 8 12 10Z" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/>
+              <path d="M12 10c1.6 0 3-1 3-2.6C15 6 13.7 5 12.4 5 11.2 5 12 8 12 10Z" fill="none" stroke="var(--accent)" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+            <span>Mesa de regalos</span>
+          </div>
+          <div class="inv-block-body">
+            Tu presencia es el mejor regalo. Si deseas obsequiarnos algo más,
+            estas son nuestras mesas de regalos.
+          </div>
+          <div class="inv-gift-links">
+            <a class="inv-gift-btn" href="https://mesaderegalos.liverpool.com.mx/milistaderegalos/60051326" target="_blank" rel="noopener">
+              <img class="inv-gift-logo" src="resources/liverpool-logo.webp" alt="Liverpool">
+            </a>
+            <a class="inv-gift-btn" href="https://www.sears.com.mx/Mesa-de-Regalos/282056/te-invitamos-a-nuestra-boda-emmanuel-y-yoatzi" target="_blank" rel="noopener">
+              <img class="inv-gift-logo" src="resources/sears-logo.svg" alt="Sears">
+            </a>
+            <a class="inv-gift-btn" href="https://meli.uniko.co/E8975/boda/emmanuel_flores_cabrerayyoatzi_oyuki_espinoza_mejia" target="_blank" rel="noopener">
+              <img class="inv-gift-logo" src="resources/ml.webp" alt="Mercado Libre">
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Wax-seal clip-path, adapted from resources/sello-de-cera.html.
+           Referenced by #seal__cera below via url(#silueta-cera); only
+           needs to exist once anywhere in this document. -->
+      <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <clipPath id="silueta-cera" clipPathUnits="objectBoundingBox">
+          <path transform="scale(0.01)" d="
+            M 27 9
+            C 34 1, 47 0, 55 2
+            C 60 4, 62 8, 68 10
+            C 74 11, 81 11, 87 15
+            C 93 20, 96 30, 99 43
+            C 101 54, 99 65, 94 75
+            C 90 84, 80 88, 71 92
+            C 63 96, 58 100, 50 99
+            C 42 98, 36 97, 30 93
+            C 25 90, 22 86, 20 83
+            C 14 78, 10 72, 6 65
+            C 0 56, 0 46, 2 39
+            C 4 32, 9 28, 15 24
+            C 19 21, 21 18, 22 14
+            C 23 12, 25 11, 27 9 Z"/>
+        </clipPath>
+      </svg>
+
+      <!-- The back panel is a SEPARATE stage-level sibling (not nested
+           inside .envelope) so its z-index can independently stay BELOW
+           the sheet at all times, regardless of what z-index .envelope
+           (the front layer) needs. JS keeps its position/size in lockstep
+           with .envelope every frame. -->
+      <div id="envelop-wrapper">
+        <div class="envelope-back" id="envelopeBack">
+          <div class="envelope-back-border"></div>
+        </div>
+  
+        <div class="envelope" id="envelope">
+          <div class="envelope-liner" id="envelopeLiner"></div>
+  
+          <div class="envelope-pocket" id="pocket"></div>
+  
+          <div class="envelope-flap" id="flap">
+            <div class="envelope-flap-face envelope-flap-front"></div>
+            <div class="envelope-flap-face envelope-flap-back"></div>
+          </div>
+  
+          <!-- Wax seal, adapted from resources/sello-de-cera.html — #seal
+               itself keeps its existing position/transform contract (see
+               .seal in styles.css; script.js writes its transform/opacity
+               every frame exactly as before), the nested seal__* divs just
+               give it the richer engraved look instead of a flat circle. -->
+          <div class="seal" id="seal">
+            <div class="seal__sombra"><div class="seal__cera"></div></div>
+            <div class="seal__cuenca"></div>
+            <div class="seal__cuno">
+              <span class="seal__texto"><span class="seal__inicial seal__inicial--1">E</span><span class="seal__amp">&amp;</span><span class="seal__inicial seal__inicial--2">Y</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scroll-hint" id="scrollHint">
+        <span class="arrow">↑</span>
+        <span>Desliza hacia arriba</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Floating "Confirmar asistencia" button — body-level (see the CSS notes
+     on .confirm-float-btn for why it lives here rather than nested inside
+     .stage), only visible during Scene 1's dwell band; script.js drives
+     its opacity/pointer-events and wires its click. -->
+<button type="button" class="confirm-float-btn" id="confirmAttendanceBtn">
+  <svg class="confirm-float-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="1.8"/>
+    <path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <span>Confirmar asistencia</span>
+</button>
+
+<!-- Body-level positioning anchor for the floating song player — see the
+     CSS notes on #invSongStickySlot/.inv-song.sticky for why the actual
+     #invSong element gets physically re-parented in here (not just
+     CSS-positioned) once it should dock to the top of the screen:
+     script.js's updateScene() moves it in/out of this empty slot. -->
+<div id="invSongStickySlot"></div>
+
+<!-- ============ Scene 2: branching RSVP ending (Branch B only) ============
+     NOT a scrollable section — every element here is position:fixed and
+     stays hidden/parked until Scene 1's own timeline settles at its end
+     (see window.__boda_emyoOnScene1End, script.js), so both branches share the
+     exact same page height; nothing to scroll into. The envelope this card
+     appears to land on top of / shrink into is the REAL #envelope/#envelopeBack
+     from Scene 1 above (rotated in place via script.js) — the guest only
+     ever sees ONE envelope in the whole experience; it never opens for
+     this part. Collapses back to its hidden/parked look (see script.js)
+     the instant the live confirmation flow finishes, so a repeat visit to
+     the bottom of the page behaves exactly like Branch A from then on. -->
+<div class="rsvp-card" id="rsvpCard">
+  <h3 class="rsvp-card-title">Confírmanos tu asistencia</h3>
+
+  <div class="rsvp-step active" id="rsvpStep0">
+    <p class="rsvp-step-hint">Por favor confirma tu asistencia</p>
+    <div class="rsvp-attend-cards">
+      <div class="rsvp-attend-option" id="rsvpOptSi">
+        <span class="rsvp-ao-label">Sí asistiré</span>
+        <span class="rsvp-ao-sub">¡Allá estaré!</span>
+      </div>
+      <div class="rsvp-attend-option" id="rsvpOptNo">
+        <span class="rsvp-ao-label">No podré ir</span>
+        <span class="rsvp-ao-sub">Lo siento mucho</span>
+      </div>
+    </div>
+    <div class="rsvp-dots">
+      <span class="rsvp-dot active" id="rsvpDot0"></span>
+      <span class="rsvp-dot" id="rsvpDot1"></span>
+      <span class="rsvp-dot" id="rsvpDot2"></span>
+    </div>
+    <button type="button" class="rsvp-next-btn" id="rsvpNextBtn0">Continuar →</button>
+  </div>
+
+  <div class="rsvp-step" id="rsvpStep1">
+    <div class="rsvp-field">
+      <span class="rsvp-field-label">Tu nombre</span>
+      <input type="text" id="rsvpNameInput" class="rsvp-input" placeholder="Nombre y apellido" autocomplete="name" maxlength="80">
+    </div>
+    <div class="rsvp-field">
+      <span class="rsvp-field-label">¿De parte de quién vienes?</span>
+      <div class="rsvp-attend-cards">
+        <div class="rsvp-attend-option selected" id="rsvpSideNovio">
+          <svg class="rsvp-ao-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M2 12 L9 7 V17 Z" stroke-linejoin="round"/>
+            <path d="M22 12 L15 7 V17 Z" stroke-linejoin="round"/>
+            <circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none"/>
+          </svg>
+          <span class="rsvp-ao-label">Novio</span>
+        </div>
+        <div class="rsvp-attend-option" id="rsvpSideNovia">
+          <svg class="rsvp-ao-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <circle cx="12" cy="7.5" r="2.6"/>
+            <circle cx="7" cy="11.5" r="2.6"/>
+            <circle cx="17" cy="11.5" r="2.6"/>
+            <circle cx="9.3" cy="15.3" r="2.6"/>
+            <circle cx="14.7" cy="15.3" r="2.6"/>
+            <circle cx="12" cy="12.4" r="1.6" fill="currentColor" stroke="none"/>
+          </svg>
+          <span class="rsvp-ao-label">Novia</span>
+        </div>
+      </div>
+    </div>
+    <div class="rsvp-field" id="rsvpGuestGroup">
+      <span class="rsvp-field-label">¿Cuántos serán?</span>
+      <div class="rsvp-guest-counter">
+        <button type="button" class="rsvp-counter-btn" id="rsvpGuestMinus">−</button>
+        <span class="rsvp-counter-num" id="rsvpGuestNum">1</span>
+        <span class="rsvp-counter-label">personas</span>
+        <button type="button" class="rsvp-counter-btn" id="rsvpGuestPlus">+</button>
+      </div>
+    </div>
+    <div class="rsvp-step-btns">
+      <button type="button" class="rsvp-back-btn" id="rsvpBackBtn1">← Atrás</button>
+      <button type="button" class="rsvp-next-btn rsvp-visible" id="rsvpNextBtn1">Revisar →</button>
+    </div>
+    <p class="rsvp-error" id="rsvpError" role="alert" aria-live="polite"></p>
+  </div>
+
+  <div class="rsvp-step" id="rsvpStep2">
+    <div class="rsvp-summary" id="rsvpSummary"></div>
+    <button type="button" class="rsvp-submit-btn" id="rsvpSubmitBtn">Confirmar asistencia</button>
+    <div class="rsvp-step-btns">
+      <button type="button" class="rsvp-back-btn" id="rsvpBackBtn2">← Editar</button>
+    </div>
+  </div>
+</div>
+
+<p class="rsvp-cutscene-title" id="rsvpCutsceneTitle" aria-live="polite"></p>
+
+<div class="rsvp-backdrop" id="rsvpBackdrop">
+  <img class="rsvp-backdrop-photo" src="resources/hero-rings.webp" alt="" aria-hidden="true">
+</div>
+
+<!-- Closing message — Branch A only (guest already confirmed on a
+     previous visit): shown once Scene 1's envelope settles closed at the
+     very end, in place of the RSVP wizard above (which only Branch B, not
+     yet confirmed, ever reaches). See script.js's readFlag() branch. -->
+<p class="closing-thanks" id="closingThanks">Gracias por ser parte de nuestra historia.<br>Los esperamos con todo el cariño para celebrar juntos el inicio de esta nueva vida.</p>
+<p class="closing-names" id="closingNames">Emmanuel<br><span class="closing-amp">&amp;</span> Yoatzi</p>
+<button type="button" class="closing-again-btn" id="closingAgainBtn">Ver de nuevo</button>
+
+<!-- Site credit bar — body-level, fixed to the viewport bottom, always
+     visible above every scene/overlay (z-index below), independent of
+     scroll position or which branch/screen is showing. -->
+<div class="site-credit-footer" id="siteCreditFooter">
+  <span>Hecho con <span class="inv-credit-heart">♥</span> en Siempre Invitados</span>
+  <a href="#" id="contactModalTrigger">¿Quieres una invitación así?</a>
+</div>
+
+<!-- Promo modal — "¿quieres una invitación así?" — same pattern/copy as
+     mi-bautizo/miguel-sebastian/index.html's contact modal, restyled to
+     this page's own palette/fonts. Triggered by #contactModalTrigger
+     inside the gift section's credit footer above; wired in script.js
+     (this page uses addEventListener throughout, not inline onclick like
+     the reference). Same "Siempre Invitados" WhatsApp number/message. -->
+<div class="contact-overlay" id="contactModal">
+  <div class="contact-modal-box">
+    <button type="button" class="contact-close" id="contactModalClose" aria-label="Cerrar">×</button>
+    <span class="contact-modal-icon">✨</span>
+    <p class="contact-modal-title">Crea invitaciones para tu evento</p>
+    <p class="contact-modal-sub">Diseños únicos y personalizados para que tu celebración sea inolvidable.<br>Escríbenos y cuéntanos sobre tu evento.</p>
+    <a class="btn-whatsapp" href="https://wa.me/5215658936778?text=Hola%2C%20me%20ayudas%20a%20crear%20una%20invitaci%C3%B3n%20para%20mi%20evento." target="_blank" rel="noopener noreferrer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+      </svg>
+      Escríbenos por WhatsApp
+    </a>
+  </div>
+</div>
+
+<script src="script.js" defer></script>
+
+</body>
+</html>
