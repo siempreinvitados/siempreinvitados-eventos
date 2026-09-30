@@ -63,6 +63,15 @@
                         <button class="filter-btn" data-filter="si" type="button">Sí</button>
                         <button class="filter-btn" data-filter="no" type="button">No</button>
                     </div>
+                    <!-- Only shown when the loaded invitation's guest records
+                         actually carry a `lado` field (e.g. boda_emyo) — see
+                         setupTable()/currentHasLado in app.js. Invitations
+                         without it (mi-bautizo, maestria) never unhide this. -->
+                    <div class="filter-group hidden" id="sideFilterGroup">
+                        <button class="filter-btn active" data-side-filter="todos" type="button">Todos</button>
+                        <button class="filter-btn" data-side-filter="novio" type="button">Novio</button>
+                        <button class="filter-btn" data-side-filter="novia" type="button">Novia</button>
+                    </div>
                 </div>
                 <div id="tableWrap"></div>
             </section>

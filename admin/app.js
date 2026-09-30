@@ -435,13 +435,21 @@ function renderStats(data) {
 
 let currentGuests = [];
 let currentFilter = 'todos';
+// "De parte de" (novio/novia) — only meaningful for invitations whose
+// records actually carry a `lado` field (currently just boda_emyo).
+// Recomputed on every setupTable() call since the dashboard can move
+// between invitations without a full page reload (see route()).
+let currentSideFilter = 'todos';
+let currentHasLado = false;
 
 function setupTable(asistentesField) {
     const toolbar = document.querySelector('.table-toolbar');
+    const sideFilterGroup = document.getElementById('sideFilterGroup');
 
     if (!asistentesField.available) {
         toolbar.classList.add('hidden');
         currentGuests = [];
+        currentHasLado = false;
         document.getElementById('tableWrap').innerHTML =
             '<div class="empty-state">Esta invitación no registra asistentes en Firebase todavía.</div>';
         return;
@@ -449,6 +457,13 @@ function setupTable(asistentesField) {
 
     toolbar.classList.remove('hidden');
     currentGuests = asistentesField.value;
+    currentHasLado = currentGuests.some(g => g.lado === 'novio' || g.lado === 'novia');
+    currentSideFilter = 'todos';
+    if (sideFilterGroup) {
+        sideFilterGroup.classList.toggle('hidden', !currentHasLado);
+        sideFilterGroup.querySelectorAll('.filter-btn').forEach(b =>
+            b.classList.toggle('active', b.dataset.sideFilter === 'todos'));
+    }
     renderTable();
 }
 
@@ -459,6 +474,7 @@ function renderTable() {
     let rows = currentGuests;
     if (currentFilter === 'si') rows = rows.filter(g => Number(g.asiste) === 1);
     if (currentFilter === 'no') rows = rows.filter(g => Number(g.asiste) !== 1);
+    if (currentHasLado && currentSideFilter !== 'todos') rows = rows.filter(g => g.lado === currentSideFilter);
     if (search) rows = rows.filter(g => (g.nombre || '').toLowerCase().includes(search));
 
     if (rows.length === 0) {
@@ -467,20 +483,26 @@ function renderTable() {
         return;
     }
 
+    const ladoTh = currentHasLado ? '<th>De parte de</th>' : '';
+
     wrap.innerHTML = `
         <table class="guest-table">
             <thead>
-                <tr><th>Nombre</th><th>Personas</th><th>Fecha</th><th>Asiste</th></tr>
+                <tr><th>Nombre</th><th>Personas</th><th>Fecha</th><th>Asiste</th>${ladoTh}</tr>
             </thead>
             <tbody>
                 ${rows.map(g => {
         const asiste = Number(g.asiste) === 1;
+        const ladoTd = currentHasLado
+            ? `<td data-label="De parte de">${escapeHtml(g.lado === 'novia' ? 'Novia' : g.lado === 'novio' ? 'Novio' : '—')}</td>`
+            : '';
         return `
                         <tr>
                             <td data-label="Nombre">${escapeHtml(g.nombre || '')}</td>
                             <td data-label="Personas">${escapeHtml(g.personas ?? 0)}</td>
                             <td data-label="Fecha de confirmación">${escapeHtml(g.date || '')}</td>
                             <td data-label="Asiste"><span class="badge ${asiste ? 'badge-yes' : 'badge-no'}">${asiste ? 'Sí' : 'No'}</span></td>
+                            ${ladoTd}
                         </tr>
                     `;
     }).join('')}
@@ -582,12 +604,25 @@ async function initFirebaseInvitations() {
    toolbar viven fijos en index.html, no se recrean en cada render) ── */
 function initDashboardControls() {
     document.getElementById('searchInput').addEventListener('input', renderTable);
-    document.getElementById('filterGroup').addEventListener('click', (e) => {
+    const filterGroup = document.getElementById('filterGroup');
+    filterGroup.addEventListener('click', (e) => {
         const btn = e.target.closest('.filter-btn');
         if (!btn) return;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        // Scoped to this group only — #sideFilterGroup below has its own
+        // .filter-btn buttons now too; a document-wide selector here would
+        // also strip its active state on every click of this group.
+        filterGroup.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentFilter = btn.dataset.filter;
+        renderTable();
+    });
+    const sideFilterGroup = document.getElementById('sideFilterGroup');
+    sideFilterGroup.addEventListener('click', (e) => {
+        const btn = e.target.closest('.filter-btn');
+        if (!btn) return;
+        sideFilterGroup.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentSideFilter = btn.dataset.sideFilter;
         renderTable();
     });
     document.getElementById('logoutBtn').addEventListener('click', () => logout(getInvitationIdFromUrl()));
