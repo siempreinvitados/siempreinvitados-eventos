@@ -876,6 +876,7 @@ window.SIFirebase && window.SIFirebase.trackVisit(INVITATION_ID);
   const errorEl = document.getElementById('rsvpError');
   const summaryEl = document.getElementById('rsvpSummary');
   const submitBtn = document.getElementById('rsvpSubmitBtn');
+  const confirmLaterBtn = document.getElementById('rsvpConfirmLaterBtn');
 
   // Scene 1's real envelope pieces — reused, never cloned. The envelope
   // now opens/closes as part of the confirm sequence (see the submit
@@ -1187,6 +1188,24 @@ window.SIFirebase && window.SIFirebase.trackVisit(INVITATION_ID);
     });
   }
 
+  // Used by confirmLaterBtn's handler below to leave the wizard in a
+  // clean state for next time, instead of resuming on whatever step/data
+  // a guest abandoned it on.
+  function resetWizard(){
+    attendChoice = null;
+    guestCount = 1;
+    guestNumEl.textContent = '1';
+    rsvpSide = 'novio';
+    sideNovio.classList.add('selected');
+    sideNovia.classList.remove('selected');
+    nameInput.value = '';
+    optSi.classList.remove('selected');
+    optNo.classList.remove('selected');
+    nextBtn0.classList.remove('rsvp-visible');
+    errorEl.textContent = '';
+    goStep(0);
+  }
+
   optSi.addEventListener('click', function(){ selectAttend('si'); });
   optNo.addEventListener('click', function(){ selectAttend('no'); });
   sideNovio.addEventListener('click', function(){ selectSide('novio'); });
@@ -1197,6 +1216,40 @@ window.SIFirebase && window.SIFirebase.trackVisit(INVITATION_ID);
   backBtn1.addEventListener('click', function(){ goStep(0); });
   nextBtn1.addEventListener('click', function(){ goStep(2); });
   backBtn2.addEventListener('click', function(){ goStep(1); });
+
+  // Escape hatch — backs all the way out of the cutscene without
+  // confirming anything. Mirrors closingAgainBtn's own reset below for
+  // the envelope/flap/seal (clearing their inline styles falls back to
+  // resting CSS, same as that handler), plus parks the card the same
+  // way and resets the one-shot `triggered` guard so onScene1End() can
+  // run again if the guest scrolls to the end a second time later —
+  // directly, not via a window.__boda_emyo* bridge, since `triggered`
+  // is declared in this very closure.
+  if (confirmLaterBtn){
+    confirmLaterBtn.addEventListener('click', function(){
+      card.style.transition = '';
+      card.style.transform = '';
+      card.style.opacity = '';
+      card.style.pointerEvents = '';
+      envelopeWrapper.style.transition = '';
+      envelopeWrapper.style.transform = '';
+      envelopeWrapper.style.opacity = '';
+      [flap, seal].forEach(function(el){
+        el.style.transition = '';
+        el.style.transform = '';
+        el.style.opacity = '';
+      });
+
+      window.__scene1Frozen = false;
+      triggered = false;
+      unlockScroll();
+      window.scrollTo(0, 0);
+      if (typeof window.__boda_emyoResyncEnvelope === 'function'){
+        window.__boda_emyoResyncEnvelope();
+      }
+      resetWizard();
+    });
+  }
 
   submitBtn.addEventListener('click', function(){
     if (submitting) return;

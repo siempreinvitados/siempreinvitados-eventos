@@ -1063,6 +1063,30 @@ html, body{
   text-align: center;
 }
 
+/* Escape hatch — visible across all 3 steps (lives outside the
+   .rsvp-step divs), lets a guest back out of the cutscene entirely
+   instead of being forced to finish the wizard. Outlined pill (not a
+   solid accent fill) so it still reads as secondary next to each step's
+   own primary button, but the border + full-width shape keep it from
+   blending into the card like plain text would. */
+.rsvp-later-btn{
+  display: block;
+  width: 100%;
+  margin: 0 0 16px;
+  background: transparent;
+  border: 1px solid var(--accent-line);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: clamp(0.78rem, 1.1vw, 0.88rem);
+  letter-spacing: 0.02em;
+  text-align: center;
+  cursor: pointer;
+  padding: 9px 14px;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.rsvp-later-btn:hover{ background: var(--accent-line); color: var(--ink); border-color: var(--ink-soft); }
+
 /* ---------- 3-step wizard (attend choice -> name+guests -> review) ----------
    Structure/interaction pattern adapted from mi-bautizo/miguel-sebastian's
    own RSVP screen (index.html:199-256, app.js:449-483) — same step-dot +
